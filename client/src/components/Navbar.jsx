@@ -38,7 +38,7 @@ const Navbar = () => {
           {/* Desktop Navigation - Hidden on mobile */}
           <div className="hidden lg:flex items-center space-x-8">
             <NavLink
-              to="/"
+              to=""
               className={({ isActive }) =>
                 `px-4 py-2 rounded-full transition-all duration-300 font-medium ${
                   isActive

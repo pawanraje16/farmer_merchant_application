@@ -24,7 +24,7 @@ const router = createBrowserRouter(
 
       {/* Main App Routes with Layout/Navbar */}
       <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route path="" element={<Home />} />
         <Route path="crops" element={<Crops />} />
         <Route path="market" element={<Market />} />
         <Route path="profile" element={<Profile />} />
