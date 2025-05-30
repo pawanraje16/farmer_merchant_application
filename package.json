@@ -2,8 +2,16 @@
   "name": "farmer_merchant-application",
   "version": "1.0.0",
   "description": "",
+  "homepage": "https://github.com/pawanraje16/farmer_merchant_application#readme",
+  "bugs": {
+    "url": "https://github.com/pawanraje16/farmer_merchant_application/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pawanraje16/farmer_merchant_application.git"
+  },
   "license": "ISC",
-  "author": "",
+  "author": "Pawanraje",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
