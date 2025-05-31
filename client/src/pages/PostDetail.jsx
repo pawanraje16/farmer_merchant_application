@@ -1,14 +1,22 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import PostImage from "../components/PostImage"
 import LoadingSpinner from "../components/LoadingSpinner"
-import pomegranateImage from "../assets/pomegranate.png"; // Adjust the path as needed
+import { useFeed } from "../context/FeedContext"
+// import pomegranateImage from "../assets/pomegranate.png"; // Adjust the path as needed
 
 
 const PostDetail = () => {
   const { postId } = useParams()
+  const { id } = useParams();
+  const {mockFeedPosts} = useFeed();
+  const selectedPost = mockFeedPosts.find(post => post._id === id);
+  // console.log(`${postId}`)
+//  if (!postId) {
+//   return <div className="text-center text-red-500 py-10 text-lg">Post not found: {postId}</div>
+// }
   const navigate = useNavigate()
   const [post, setPost] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -20,7 +28,11 @@ const PostDetail = () => {
     title: "Premium Organic Basmati Rice - Farm Fresh",
     description:
       "Freshly harvested premium basmati rice from my organic farm. No chemicals, no pesticides. Perfect for healthy cooking and special occasions. This rice is grown using traditional farming methods that have been passed down through generations in our family. The grains are long, aromatic, and cook perfectly fluffy every time. We harvest only when the crop is fully mature to ensure the best flavor and nutritional value.",
-    images: [pomegranateImage, pomegranateImage, pomegranateImage],
+     images: [
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+      ],
 
     price: 85,
     priceUnit: "per kg",

@@ -7,23 +7,26 @@ import PostFilters from "../components/PostFilters"
 import PageHeader from "../components/PageHeader"
 import LoadingSpinner from "../components/LoadingSpinner"
 import EmptyState from "../components/EmptyState"
+import { useFeed } from "../context/FeedContext"
 
 const Crops = () => {
   const navigate = useNavigate()
-  const [posts, setPosts] = useState([])
-  const [filteredPosts, setFilteredPosts] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [filters, setFilters] = useState({
-    cropType: "all",
-    location: {
-      state: "all",
-      district: "all",
-    },
-    priceRange: "all",
-    availability: "all",
-    organic: false,
-  })
+  // const [posts, setPosts] = useState([])
+  // const [filteredPosts, setFilteredPosts] = useState([])
+  // const [isLoading, setIsLoading] = useState(true)
+  // const [filters, setFilters] = useState({
+  //   cropType: "all",
+  //   location: {
+  //     state: "all",
+  //     district: "all",
+  //   },
+  //   priceRange: "all",
+  //   availability: "all",
+  //   organic: false,
+  // })
 
+
+  const {posts, setPosts, filteredPosts, setFilteredPosts, isLoading, setIsLoading, filters, setFilters}=useFeed();
   // Mock posts data - same as home feed but with more crop details
   const mockPostsData = [
     {
@@ -265,10 +268,13 @@ const Crops = () => {
   }, [])
 
   useEffect(() => {
+      console.log("Filters:", filters);
+      console.log("Posts:", posts);
+
     // Apply filters
     const filtered = posts.filter((post) => {
       // Crop type filter
-      if (filters.cropType !== "all" && post.category !== filters.cropType) {
+      if (filters.category !== "all" && post.category !== filters.category) {
         return false
       }
 
@@ -312,9 +318,9 @@ const Crops = () => {
     setFilters(newFilters)
   }
 
-  const handlePostClick = (post) => {
+  const handlePostClick = (postId) => {
     // Navigate to post detail view first
-    navigate(`/post/${post._id}`)
+    navigate(`/post/${postId}`)
   }
 
   const handleAuthorClick = (authorId) => {
@@ -352,7 +358,7 @@ const Crops = () => {
               <FeedPost
                 key={post._id}
                 post={post}
-                onPostClick={() => handlePostClick(post)}
+                onPostClick={() => handlePostClick(post._id)}
                 onAuthorClick={() => handleAuthorClick(post.author._id)}
                 onChatClick={() => handleChatClick(post.author._id)}
               />

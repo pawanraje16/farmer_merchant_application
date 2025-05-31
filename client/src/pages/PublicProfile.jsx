@@ -7,6 +7,7 @@ import ProfileTabs from "../components/ProfileTabs"
 import UserPosts from "../components/UserPosts"
 import UserAbout from "../components/UserAbout"
 import UserReviews from "../components/UserReviews"
+import { useFeed } from "../context/FeedContext"
 
 const PublicProfile = () => {
   const { userId } = useParams()
@@ -18,6 +19,10 @@ const PublicProfile = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isFollowing, setIsFollowing] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+
+  //debuggig
+  const {mockFeedPosts}=useFeed();
+  const user = mockFeedPosts.filter(post => post.author._id === userId);
 
   // Mock data for the public profile
   const mockPublicProfile = {
@@ -185,6 +190,7 @@ const PublicProfile = () => {
       try {
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1000))
+        console.log(userId);
         setUserProfile(mockPublicProfile)
         setUserPosts(mockPublicPosts)
         setUserReviews(mockReviews)
@@ -279,6 +285,21 @@ const PublicProfile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+      <h1>{userId}</h1>
+      {user.map((post) => (
+    <div key={post._id} className="post-card">
+    <h2>{post.title}</h2>
+    <p>{post.description}</p>
+    <p>Price: ₹{post.price} {post.priceUnit}</p>
+    <p>Category: {post.category}</p>
+    <p>Location: {post.location.city}, {post.location.state}</p>
+    <p>Author: {post.author.fullName}</p>
+    <img src={post.images[0]} alt={post.title} width={200} />
+    <hr />
+  </div>
+))}
+
+      <p>gberuierbekfweiereriujkdnvdgriuerherfdkrrfgherdkfjsdhbrjkfgerhfgdrfjdbdfgvjdf</p>
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Profile Header */}
         <UserProfileHeader

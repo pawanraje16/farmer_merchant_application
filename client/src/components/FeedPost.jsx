@@ -30,7 +30,10 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
     setIsLiked(!isLiked)
     setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
   }
-
+  const handlePostClick = (e) =>{
+     e.stopPropagation()
+     onPostClick()
+  }
   const handleAuthorClick = (e) => {
     e.stopPropagation()
     onAuthorClick()
@@ -43,9 +46,9 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
 
   return (
     <div
-      className="group bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200 relative overflow-hidden cursor-pointer"
-      onClick={() => onPostClick(post)}
-    >
+      className="group bg-gradient-to-br from-red to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200  bg-red-600 relative overflow-hidden cursor-pointer"
+      onClick={() => handlePostClick}
+    > <h1>pawanraje Ukarde</h1>
       {/* Featured Badge */}
       {post.isFeatured && (
         <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-10">
@@ -101,6 +104,7 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
       <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-8 space-y-6 lg:space-y-0">
         {/* Post Images */}
         <div className="lg:w-1/3">
+        
           <div className="grid grid-cols-2 gap-3">
             {post.images.slice(0, 4).map((image, index) => (
               <div

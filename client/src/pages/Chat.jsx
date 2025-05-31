@@ -6,7 +6,7 @@ import ChatList from "../components/ChatList"
 
 const Chat = () => {
   const { userId } = useParams()
-
+  
   // If userId is provided, show chat interface, otherwise show chat list
   return <div className="w-full">{userId ? <ChatInterface /> : <ChatList />}</div>
 }

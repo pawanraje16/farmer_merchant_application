@@ -12,11 +12,15 @@ export const FeedProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({
     category: "all",
-    location: "all",
+    location: {
+      state: "all",
+      district: "all",
+    },
     priceRange: "all",
-    sortBy: "latest",
-  });
-
+    availability: "all",
+    organic: false,
+  })
+  const [filteredPosts, setFilteredPosts] = useState([])
     const mockFeedPosts = [
     {
       _id: "feed_post_1",
@@ -260,6 +264,8 @@ export const FeedProvider = ({ children }) => {
         filters,
         setFilters,
         setIsLoading,
+        filteredPosts,
+        setFilteredPosts,
         fetchPosts,
         handleFilterChange,
         handlePostClick,
