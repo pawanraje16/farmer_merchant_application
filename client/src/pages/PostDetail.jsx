@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import PostImage from "../components/PostImage"
 import LoadingSpinner from "../components/LoadingSpinner"
+import pomegranateImage from "../assets/pomegranate.png"; // Adjust the path as needed
+
 
 const PostDetail = () => {
   const { postId } = useParams()
@@ -18,12 +20,8 @@ const PostDetail = () => {
     title: "Premium Organic Basmati Rice - Farm Fresh",
     description:
       "Freshly harvested premium basmati rice from my organic farm. No chemicals, no pesticides. Perfect for healthy cooking and special occasions. This rice is grown using traditional farming methods that have been passed down through generations in our family. The grains are long, aromatic, and cook perfectly fluffy every time. We harvest only when the crop is fully mature to ensure the best flavor and nutritional value.",
-    images: [
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
-    ],
+    images: [pomegranateImage, pomegranateImage, pomegranateImage],
+
     price: 85,
     priceUnit: "per kg",
     originalPrice: 95,

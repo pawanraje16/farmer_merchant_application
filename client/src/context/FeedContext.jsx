@@ -1,36 +1,23 @@
-// "use client"
+import React, { createContext, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // use fetch if you prefer
 
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import FeedPost from "../components/FeedPost"
-import CreatePostPrompt from "../components/CreatePostPrompt"
-import PostFilters from "../components/PostFilters"
-import PageHeader from "../components/PageHeader"
-import LoadingSpinner from "../components/LoadingSpinner"
-import EmptyState from "../components/EmptyState"
-import { useFeed } from "../context/FeedContext"
+const FeedContext = createContext();
+export const useFeed = () => useContext(FeedContext);
 
-const Home = () => {
-  const navigate = useNavigate()
-  // const [posts, setPosts] = useState([])
-  // const [isLoading, setIsLoading] = useState(true)
-  // const [filters, setFilters] = useState({
-  //   category: "all",
-  //   location: "all",
-  //   priceRange: "all",
-  //   sortBy: "latest",
-  // })
+export const FeedProvider = ({ children }) => {
+  const navigate = useNavigate();
 
-   const {posts,setPosts,isLoading,setIsLoading,handlePostClick,
-    handleAuthorClick,
-    handleChatClick,filters}=useFeed()
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    category: "all",
+    location: "all",
+    priceRange: "all",
+    sortBy: "latest",
+  });
 
-
-
-
-
-  // Mock feed data with diverse posts from different users
-  const mockFeedPosts = [
+    const mockFeedPosts = [
     {
       _id: "feed_post_1",
       title: "Premium Organic Basmati Rice - Farm Fresh",
@@ -239,85 +226,50 @@ const Home = () => {
     },
   ]
 
-  useEffect(() => {
-    const loadFeedPosts = async () => {
-      setIsLoading(true)
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setPosts(mockFeedPosts)
-      } catch (error) {
-        console.error("Error loading feed:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
 
-    loadFeedPosts()
-  }, [])
+
+
+  // ✅ Common data fetch
+  const fetchPosts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('/api/posts'); // Adjust your endpoint
+      setPosts(response.data);
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters)
-    // In real app, this would trigger API call with filters
-    console.log("Applying filters:", newFilters)
-  }
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  };
 
-  // const handlePostClick = (post) => {
-  //   // Navigate to the post detail page
-  //   navigate(`/post/${post._id}`)
-  // }
-
-  const handleCreatePost = () => {
-    navigate("/create-post")
-  }
-
-  if (isLoading) {
-    return <LoadingSpinner message="Loading your feed..." icon="🌾" />
-  }
+  const handlePostClick = (postId) => navigate(`/post/${postId}`);
+  const handleAuthorClick = (authorId) => navigate(`/profile/${authorId}`);
+  const handleChatClick = (userId) => navigate(`/chat/${userId}`);
+  const handleCreatePost = () => navigate(`/create-post`);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Welcome Header */}
-        <PageHeader
-          title="Welcome to AgroConnect"
-          subtitle="Discover fresh products and connect with farmers & merchants across India"
-          icon="🌾"
-          stats={[`${posts.length} Active Posts`]}
-          actions={[{ label: "+ Create Post", onClick: handleCreatePost }]}
-        />
-
-        {/* Create Post Prompt */}
-        {/* <CreatePostPrompt onCreatePost={handleCreatePost} /> */}
-
-        {/* Filters */}
-        <PostFilters filters={filters} onFilterChange={handleFilterChange} />
-
-        {/* Feed Posts */}
-        <div className="space-y-8">
-          {posts.length > 0 ? (
-            posts.map((post) => (
-              <FeedPost
-                key={post._id}
-                post={post}
-                onPostClick={() => handlePostClick(post)}
-                onAuthorClick={() => navigate(`/user/${post.author._id}`)}
-                onChatClick={() => navigate(`/chat/${post.author._id}`)}
-              />
-            ))
-          ) : (
-            <EmptyState
-              title="No posts available"
-              message="Be the first to share your products with the AgroConnect community!"
-              icon="📝"
-              actionLabel="🌾 Create Your First Post"
-              onAction={handleCreatePost}
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default Home
+    <FeedContext.Provider
+      value={{
+        posts,
+        setPosts,
+        isLoading,
+        filters,
+        setFilters,
+        setIsLoading,
+        fetchPosts,
+        handleFilterChange,
+        handlePostClick,
+        handleAuthorClick,
+        handleChatClick,
+        handleCreatePost,
+        mockFeedPosts,
+      }}
+    >
+      {children}
+    </FeedContext.Provider>
+  );
+};

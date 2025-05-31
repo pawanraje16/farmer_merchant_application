@@ -1,9 +1,12 @@
-"use client"
+// "use client"
 
 import { useState } from "react"
 import PostImage from "./PostImage"
+import { useFeed } from "../context/FeedContext"
 
-const FeedPost = ({ post, onPostClick, onAuthorClick, onChatClick }) => {
+const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
+
+  
   const [isLiked, setIsLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(post.likes)
 
