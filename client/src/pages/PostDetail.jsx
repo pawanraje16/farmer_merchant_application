@@ -5,7 +5,6 @@ import { useParams, useNavigate } from "react-router-dom"
 import PostImage from "../components/PostImage"
 import LoadingSpinner from "../components/LoadingSpinner"
 import { useFeed } from "../context/FeedContext"
-// import pomegranateImage from "../assets/pomegranate.png"; // Adjust the path as needed
 
 
 const PostDetail = () => {

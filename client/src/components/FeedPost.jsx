@@ -1,4 +1,4 @@
-// "use client"
+
 
 import { useState } from "react"
 import PostImage from "./PostImage"
@@ -46,8 +46,8 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
 
   return (
     <div
-      className="group bg-gradient-to-br from-red to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200  bg-red-600 relative overflow-hidden cursor-pointer"
-      onClick={() => handlePostClick}
+      className="group bg-gradient-to-br from-red to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200  bg-green-600 relative overflow-hidden cursor-pointer"
+     
     > <h1>pawanraje Ukarde</h1>
       {/* Featured Badge */}
       {post.isFeatured && (
@@ -94,7 +94,7 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
         </div>
 
         <button
-          onClick={handleChatClick}
+          onClick={ handleChatClick }
           className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors font-medium text-sm"
         >
           💬 Chat
@@ -103,7 +103,7 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
 
       <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-8 space-y-6 lg:space-y-0">
         {/* Post Images */}
-        <div className="lg:w-1/3">
+        <div className="lg:w-1/3"  onClick={handlePostClick} >
         
           <div className="grid grid-cols-2 gap-3">
             {post.images.slice(0, 4).map((image, index) => (

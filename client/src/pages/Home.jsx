@@ -300,7 +300,7 @@ const Home = () => {
               <FeedPost
                 key={post._id}
                 post={post}
-                onPostClick={() => handlePostClick(post)}
+                onPostClick={() => handlePostClick(post._id)}
                 onAuthorClick={() => navigate(`/user/${post.author._id}`)}
                 onChatClick={() => navigate(`/chat/${post.author._id}`)}
               />

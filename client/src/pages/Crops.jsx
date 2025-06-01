@@ -30,7 +30,7 @@ const Crops = () => {
   // Mock posts data - same as home feed but with more crop details
   const mockPostsData = [
     {
-      _id: "feed_post_1",
+      _id: "345",
       title: "Premium Organic Basmati Rice - Farm Fresh",
       description:
         "Freshly harvested premium basmati rice from my organic farm. No chemicals, no pesticides. Perfect for healthy cooking and special occasions.",
@@ -69,7 +69,7 @@ const Crops = () => {
       },
     },
     {
-      _id: "feed_post_2",
+      _id: "435",
       title: "Fresh Organic Spinach - Iron Rich",
       description:
         "Freshly harvested organic spinach from our farm. Rich in iron, vitamins, and minerals. Perfect for healthy cooking and salads.",
@@ -104,7 +104,7 @@ const Crops = () => {
       },
     },
     {
-      _id: "feed_post_3",
+      _id: "123",
       title: "Looking for Bulk Wheat Purchase - 1000kg",
       description:
         "Need high-quality wheat for my flour mill. Looking for 1000kg monthly supply. Prefer organic or naturally grown wheat. Good rates assured.",
