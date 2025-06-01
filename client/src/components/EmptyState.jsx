@@ -1,4 +1,4 @@
-"use client"
+
 
 const EmptyState = ({ title, message, icon, actionLabel, onAction, showAction = true }) => {
   return (

@@ -46,7 +46,7 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
 
   return (
     <div
-      className="group bg-gradient-to-br from-red to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200  bg-green-600 relative overflow-hidden cursor-pointer"
+      className="group bg-gradient-to-br from-red to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200 relative overflow-hidden cursor-pointer"
      
     > <h1>pawanraje Ukarde</h1>
       {/* Featured Badge */}

@@ -1,6 +1,9 @@
-"use client"
+import React from "react"
+import { Navigate } from "react-router-dom"
 
 const PageHeader = ({ title, subtitle, icon, stats = [], actions = [] }) => {
+
+  // const createPost=>()
   return (
     <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mb-8 border border-gray-100">
       <div className="px-6 md:px-8 py-8">

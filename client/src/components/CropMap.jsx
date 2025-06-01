@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 const CropMap = ({ crops, onCropClick }) => {
   // This is a placeholder for map implementation

@@ -16,6 +16,8 @@ import Register from './pages/Register.jsx'
 import PublicProfile from './pages/PublicProfile.jsx'
 import PostDetail from './pages/PostDetail.jsx'
 import ProductPost from './components/ProductPost.jsx'
+import CreatePostPrompt from './components/CreatePostPrompt.jsx'
+import CreatePost from './pages/CreatePost.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,6 +36,7 @@ const router = createBrowserRouter(
         <Route path="chat" element={<Chat />} />
         <Route path="chat/:userId" element={<Chat />} />
         <Route path="post/:postId" element={<PostDetail/>}/>
+        <Route path="create-post" element={<CreatePost/>}/>
       </Route>
     </>,
   ),
