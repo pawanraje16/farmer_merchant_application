@@ -203,9 +203,9 @@ const UserProfileHeader = ({
                   >
                     {isFollowing ? "✓ Following" : "➕ Follow"}
                   </button>
-                  <button className="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-medium">
+                  {/* <button className="px-4 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 font-medium">
                     ⚠️
-                  </button>
+                  </button> */}
                 </>
               )}
             </div>

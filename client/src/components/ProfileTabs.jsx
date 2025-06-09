@@ -1,4 +1,3 @@
-"use client"
 
 const ProfileTabs = ({ activeTab, setActiveTab, userProfile, isOwnProfile = false }) => {
   const tabs = [
