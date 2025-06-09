@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"
 import PostImage from "./PostImage"
 
 const ProductPost = ({ post }) => {
@@ -16,6 +17,8 @@ const ProductPost = ({ post }) => {
     })
   }
 
+  const navigate= useNavigate();
+
   return (
     <div className="group bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200 relative overflow-hidden">
       {/* Featured Badge */}
@@ -33,16 +36,22 @@ const ProductPost = ({ post }) => {
               <div
                 key={index}
                 className="relative rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all"
+                onClick={() => navigate(`/post/${post._id}`)}
               >
                 <PostImage src={image} alt={`${post.title} - Image ${index + 1}`} className="w-full h-24 md:h-32" />
                 {index === 3 && post.images.length > 4 && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-bold">
                     +{post.images.length - 4}
+                    
                   </div>
                 )}
+                
               </div>
+              
             ))}
+              
           </div>
+        
         </div>
 
         {/* Post Content */}
@@ -52,7 +61,7 @@ const ProductPost = ({ post }) => {
               <h3 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">
                 {post.title}
               </h3>
-              <p className="text-gray-600 leading-relaxed">{post.description}</p>
+              <p className="text-gray-600 leading-relaxed">{post.description} pawanraje Ukarde patil</p>
             </div>
             <div className="text-right ml-4">
               <div className="flex items-center space-x-2">

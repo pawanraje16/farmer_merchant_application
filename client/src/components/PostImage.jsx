@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 
 const PostImage = ({ src, alt, className }) => {
@@ -47,6 +46,7 @@ const PostImage = ({ src, alt, className }) => {
           setHasError(true)
         }}
       />
+      
     </div>
   )
 }

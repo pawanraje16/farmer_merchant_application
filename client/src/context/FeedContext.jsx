@@ -6,7 +6,7 @@ const FeedContext = createContext();
 export const useFeed = () => useContext(FeedContext);
 
 export const FeedProvider = ({ children }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -540,6 +540,7 @@ export const FeedProvider = ({ children }) => {
         mockPublicProfile,
         mockPublicPosts,
         mockReviews,
+        
       }}
     >
       {children}

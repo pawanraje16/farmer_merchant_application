@@ -90,8 +90,7 @@ const Home = () => {
               <FeedPost
                 key={post._id}
                 post={post}
-                
-                
+
               />
             ))
           ) : (

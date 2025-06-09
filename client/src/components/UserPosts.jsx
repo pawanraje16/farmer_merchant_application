@@ -1,4 +1,3 @@
-"use client"
 
 import ProductPost from "./ProductPost"
 
