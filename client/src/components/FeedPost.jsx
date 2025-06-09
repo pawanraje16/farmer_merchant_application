@@ -3,10 +3,11 @@
 import { useState } from "react"
 import PostImage from "./PostImage"
 import { useFeed } from "../context/FeedContext"
+import { useNavigate } from "react-router-dom"
 
-const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
+const FeedPost = ({ post, onAuthorClick}) => {
 
-  
+  const navigate=useNavigate();
   const [isLiked, setIsLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(post.likes)
 
@@ -30,18 +31,16 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
     setIsLiked(!isLiked)
     setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
   }
-  const handlePostClick = (e) =>{
-     e.stopPropagation()
-     onPostClick()
+  const handlePostClick = (postId) =>{
+    //  e.stopPropagation()
+     navigate(`/post/${postId}`)
   }
-  const handleAuthorClick = (e) => {
-    e.stopPropagation()
-    onAuthorClick()
+  const handleAuthorClick = (authorId) => {
+   navigate(`/user/${authorId}`)
   }
 
-  const handleChatClick = (e) => {
-    e.stopPropagation()
-    onChatClick()
+  const handleChatClick = (authorId) => {
+    navigate(`/chat/${authorId}`)
   }
 
   return (
@@ -60,7 +59,7 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
       <div className="flex items-center justify-between mb-6">
         <div
           className="flex items-center space-x-4 cursor-pointer hover:bg-gray-50 rounded-xl p-2 -m-2 transition-colors"
-          onClick={handleAuthorClick}
+          onClick={() => handleAuthorClick(post.author._id)}
         >
           <div className="relative">
             <img
@@ -94,7 +93,7 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
         </div>
 
         <button
-          onClick={ handleChatClick }
+          onClick={() => handleChatClick(post.author._id) }
           className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors font-medium text-sm"
         >
           💬 Chat
@@ -103,7 +102,7 @@ const FeedPost = ({ post,  onPostClick, onAuthorClick, onChatClick}) => {
 
       <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-8 space-y-6 lg:space-y-0">
         {/* Post Images */}
-        <div className="lg:w-1/3"  onClick={handlePostClick} >
+        <div className="lg:w-1/3"  onClick={() =>handlePostClick(post._id)} >
         
           <div className="grid grid-cols-2 gap-3">
             {post.images.slice(0, 4).map((image, index) => (
