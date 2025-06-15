@@ -18,6 +18,7 @@ const userSchema = new Schema(
         unique: true,
         lowercase: true,
         trim: true,
+        match:[/^\S+@\S+\.\S+$/,"please enter a valid email schema"],
     },
     fullName: {
         type: String,
@@ -26,12 +27,16 @@ const userSchema = new Schema(
         index:true
     },
     adharNo:{
-        type: Number,
+        type: String,
         required:true,
+        minlength: 12,
+        maxlength: 12,
+        match: [/^\d{12}$/, "Aadhaar must be 12 digits"],
     },
     userType:{
         type: String,
         required: true,
+        lowercase: true,
     },
     avatar: {
         type: String, // cloudinary url
@@ -42,7 +47,8 @@ const userSchema = new Schema(
     },
     password: {
         type: String,
-        required: [true, 'Password is required']
+        required: [true, 'Password is required'],
+        minlength: 6,
     },
     refreshToken: {
         type: String
