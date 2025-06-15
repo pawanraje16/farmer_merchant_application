@@ -68,11 +68,11 @@ const UserProfileHeader = ({
           {/* Left Side - Profile Photo & Info */}
           <div className="flex flex-col md:flex-row md:items-start space-y-6 md:space-y-0 md:space-x-8">
             <div className="relative group">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-white shadow-2xl overflow-hidden bg-gradient-to-br from-green-400 to-blue-500 p-1">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white flex items-center justify-center">
                 <img
                   src={userProfile?.profilePhoto || "/placeholder.svg?height=160&width=160"}
                   alt="Profile"
-                  className="w-full h-full object-cover rounded-2xl"
+                  className="max-w-full max-h-full object-contain object-center"
                 />
               </div>
               <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full p-3 shadow-lg">

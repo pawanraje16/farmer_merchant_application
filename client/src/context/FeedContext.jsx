@@ -1,13 +1,15 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // use fetch if you prefer
+import { proPhoto, fruits } from '../assets/assets';
 
 const FeedContext = createContext();
 export const useFeed = () => useContext(FeedContext);
 
 export const FeedProvider = ({ children }) => {
   // const navigate = useNavigate();
-
+  const [user, setUser] = useState(null);
+  const [isFarmer, setIsFarmer] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -26,7 +28,7 @@ export const FeedProvider = ({ children }) => {
             _id: "feed_post_7",
             title: "Organic Carrots - Freshly Harvested",
             description: "Crunchy, sweet organic carrots straight from the farm. No chemicals, just natural goodness.",
-            images: ["/placeholder.svg?height=400&width=600"],
+            images: [fruits.pomo[0],fruits.pomo[1],fruits.pomo[2]],
             price: 35,
             priceUnit: "per kg",
             originalPrice: null,
@@ -58,8 +60,8 @@ export const FeedProvider = ({ children }) => {
             author: {
               _id: "user345",
               username: "carrot_farm_amit",
-              fullName: "Amit Rana",
-              profilePhoto: "/placeholder.svg",
+              fullName: "Ram Bhosale",
+              profilePhoto: proPhoto.ram,
               userType: "farmer",
               isVerified: true,
               rating: 4.2,
@@ -72,12 +74,12 @@ export const FeedProvider = ({ children }) => {
             _id: "feed_post_8",
             title: "Looking for High-Quality Wheat - 2000 kg Required",
             description: "We are looking to buy 2000 kg of wheat per month for our processing unit. Only premium quality accepted.",
-            images: [],
+            images: [fruits.grape[0],fruits.grape[1],fruits.grape[2]],
             price: 28,
             priceUnit: "per kg (negotiable)",
             originalPrice: null,
-            category: "Grains",
-            cropType: "Wheat",
+            category: "Fruits",
+            cropType: "Grapes",
             quantity: "2000 kg monthly",
             location: {
               state: "Rajasthan",
@@ -97,9 +99,9 @@ export const FeedProvider = ({ children }) => {
             tags: ["bulk", "wheat", "buyer", "rajasthan"],
             author: {
               _id: "user789",
-              username: "wheat_buyer_rajesh",
-              fullName: "Rajesh Jain",
-              profilePhoto: "/placeholder.svg",
+              username: "Ajay@82",
+              fullName: "Ajay Sarode",
+              profilePhoto: proPhoto.ajay,
               userType: "merchant",
               isVerified: true,
               rating: 4.5,
@@ -249,13 +251,13 @@ export const FeedProvider = ({ children }) => {
 
     {
   _id: "user789",
-  username: "wheat_buyer_rajesh",
+  username: "Ajay@82",
   email: "rajesh@grainbuyers.in",
   userType: "merchant",
   majorProduct: "Bulk Grain Procurement",
-  profilePhoto: "/placeholder.svg?height=150&width=150",
+  profilePhoto: proPhoto.ajay,
   coverPhoto: "/placeholder.svg?height=300&width=800",
-  fullName: "Rajesh Jain",
+  fullName: "Ajay Patil",
   location: {
     state: "Rajasthan",
     district: "Jaipur",
@@ -264,7 +266,7 @@ export const FeedProvider = ({ children }) => {
   },
   bio: "📦 Buying premium-grade wheat, rice & millet from verified farmers across India. Transparency and fair pricing guaranteed.",
   farmDetails: {
-    farmSize: "N/A",
+    farmSize: "10 acre",
     farmingType: "Bulk Merchant",
     experience: "10 years",
     certifications: ["FSSAI Licensed", "ISO Certified Buyer"]
@@ -395,11 +397,11 @@ export const FeedProvider = ({ children }) => {
 
    const mockPublicPosts = [
     {
-      _id: "post101",
+      _id: "feed_post_8",
       title: "Fresh Organic Spinach - Iron Rich",
       description:
         "Freshly harvested organic spinach from our farm. Rich in iron, vitamins, and minerals. Perfect for healthy cooking and salads. No chemicals used.",
-      images: ["/placeholder.svg?height=300&width=400", "/placeholder.svg?height=300&width=400"],
+      images: fruits.grape,
       price: 40,
       priceUnit: "per kg",
       originalPrice: null,

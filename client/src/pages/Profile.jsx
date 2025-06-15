@@ -1,8 +1,11 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import ProductPost from "../components/ProductPost"
+import pawanImage from "./profilePhoto/pawan.png"; // relative path from Profile.jsx
+import { fruits, proPhoto } from "../assets/assets";
+
 
 const Profile = () => {
   const navigate = useNavigate()
@@ -20,7 +23,7 @@ const Profile = () => {
     email: "raj@example.com",
     userType: "farmer",
     majorProduct: "Rice, Wheat, Organic Vegetables",
-    profilePhoto: "/placeholder.svg?height=150&width=150",
+    profilePhoto: proPhoto.ram,
     coverPhoto: "/placeholder.svg?height=300&width=800",
     fullName: "Raj Kumar Singh",
     aadhaarNumber: "1234****5678",
@@ -67,14 +70,14 @@ const Profile = () => {
 
   const mockUserPosts = [
     {
-      _id: "post1",
+      _id: "feed_post_7",
       title: "Premium Organic Basmati Rice - Farm Fresh",
       description:
         "Freshly harvested premium basmati rice from my organic farm. No chemicals, no pesticides. Perfect for healthy cooking and special occasions.",
       images: [
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
+        fruits.pomo[0],
+        fruits.pomo[1],
+        fruits.pomo[2],
       ],
       price: 85,
       priceUnit: "per kg",
@@ -177,7 +180,7 @@ const Profile = () => {
       description:
         "Fresh seasonal vegetables box containing potatoes, onions, carrots, cabbage, and green beans. All organically grown on our farm. Perfect for families.",
       images: [
-        "/placeholder.svg?height=300&width=400",
+        "https://images.app.goo.gl/DYXBxqjZX46cbpN4A",
         "/placeholder.svg?height=300&width=400",
         "/placeholder.svg?height=300&width=400",
       ],
@@ -415,7 +418,7 @@ const Profile = () => {
                 <div className="relative group">
                   <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-white shadow-2xl overflow-hidden bg-gradient-to-br from-green-400 to-blue-500 p-1">
                     <img
-                      src={userProfile?.profilePhoto || "/placeholder.svg?height=160&width=160"}
+                      src={userProfile?.profilePhoto || "https://images.app.goo.gl/DYXBxqjZX46cbpN4A"}
                       alt="Profile"
                       className="w-full h-full object-cover rounded-2xl"
                     />

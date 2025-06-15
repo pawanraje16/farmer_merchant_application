@@ -1,11 +1,12 @@
-"use client"
 
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 
-const Register = () => {
+export default function Register() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
+    name: "",
+    contactNumber: "",
     username: "",
     email: "",
     password: "",
@@ -55,6 +56,18 @@ const Register = () => {
 
   const validateForm = () => {
     const newErrors = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required"
+    } else if (formData.name.length < 2) {
+      newErrors.name = "Name must be at least 2 characters"
+    }
+
+    if (!formData.contactNumber.trim()) {
+      newErrors.contactNumber = "Contact number is required"
+    } else if (!/^[6-9]\d{9}$/.test(formData.contactNumber)) {
+      newErrors.contactNumber = "Please enter a valid 10-digit mobile number"
+    }
 
     if (!formData.username.trim()) {
       newErrors.username = "Username is required"
@@ -164,6 +177,49 @@ const Register = () => {
                 </label>
               </div>
               <p className="mt-2 text-xs text-gray-500">Upload profile photo (optional)</p>
+            </div>
+
+            {/* Full Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Full Name</label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-green-500">👤</span>
+                </div>
+                <input
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={`pl-10 block w-full py-3 border ${
+                    errors.name ? "border-red-300" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+            </div>
+
+            {/* Contact Number */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Contact Number</label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-green-500">📱</span>
+                </div>
+                <input
+                  name="contactNumber"
+                  type="tel"
+                  value={formData.contactNumber}
+                  onChange={handleChange}
+                  className={`pl-10 block w-full py-3 border ${
+                    errors.contactNumber ? "border-red-300" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
+                  placeholder="Enter 10-digit mobile number"
+                  maxLength="10"
+                />
+              </div>
+              {errors.contactNumber && <p className="mt-1 text-sm text-red-600">{errors.contactNumber}</p>}
             </div>
 
             {/* Username */}
@@ -438,5 +494,3 @@ const Register = () => {
     </div>
   )
 }
-
-export default Register

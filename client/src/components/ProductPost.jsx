@@ -61,7 +61,7 @@ const ProductPost = ({ post }) => {
               <h3 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">
                 {post.title}
               </h3>
-              <p className="text-gray-600 leading-relaxed">{post.description} pawanraje Ukarde patil</p>
+              <p className="text-gray-600 leading-relaxed">{post.description} </p>
             </div>
             <div className="text-right ml-4">
               <div className="flex items-center space-x-2">
