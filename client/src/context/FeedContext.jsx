@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // use fetch if you prefer
 import { proPhoto, fruits } from '../assets/assets';
 
+
+axios.defaults.withCredentials = true,
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
+
 const FeedContext = createContext();
 export const useFeed = () => useContext(FeedContext);
 
@@ -542,7 +546,7 @@ export const FeedProvider = ({ children }) => {
         mockPublicProfile,
         mockPublicPosts,
         mockReviews,
-        
+        axios,
       }}
     >
       {children}

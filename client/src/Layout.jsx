@@ -6,10 +6,10 @@ import { FeedProvider } from "./context/FeedContext";
 function Layout() {
     return (
         <>
-        <Navbar/>
-        <FeedProvider>
+        
+            <Navbar/>
             <Outlet/>
-        </FeedProvider>
+        
         </>
     )
 }

@@ -1,26 +1,30 @@
+"use client"
 
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { useFeed } from "../context/FeedContext"
 
 export default function Register() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
-    name: "",
-    contactNumber: "",
+    fullName: "",
+    contact: "",
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    aadhaarNumber: "",
+    adharNo: "",
     userType: "", // farmer or merchant
     majorProduct: "", // flexible field for main product/crop interest
-    profilePhoto: null,
+    avatar: null, // User profile photo
     agreeToTerms: false,
   })
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [photoPreview, setPhotoPreview] = useState(null)
+
+  const { axios } = useFeed()
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -40,10 +44,36 @@ export default function Register() {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0]
     if (file) {
+      // Validate file size (optional - add 5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({
+          ...errors,
+          avatar: "File size should be less than 5MB",
+        })
+        return
+      }
+
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setErrors({
+          ...errors,
+          avatar: "Please select a valid image file",
+        })
+        return
+      }
+
       setFormData({
         ...formData,
-        profilePhoto: file,
+        avatar: file,
       })
+
+      // Clear any previous avatar errors
+      if (errors.avatar) {
+        setErrors({
+          ...errors,
+          avatar: "",
+        })
+      }
 
       // Create preview
       const reader = new FileReader()
@@ -57,16 +87,16 @@ export default function Register() {
   const validateForm = () => {
     const newErrors = {}
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Full name is required"
-    } else if (formData.name.length < 2) {
-      newErrors.name = "Name must be at least 2 characters"
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required"
+    } else if (formData.fullName.length < 2) {
+      newErrors.fullName = "Name must be at least 2 characters"
     }
 
-    if (!formData.contactNumber.trim()) {
-      newErrors.contactNumber = "Contact number is required"
-    } else if (!/^[6-9]\d{9}$/.test(formData.contactNumber)) {
-      newErrors.contactNumber = "Please enter a valid 10-digit mobile number"
+    if (!formData.contact.trim()) {
+      newErrors.contact = "Contact number is required"
+    } else if (!/^[6-9]\d{9}$/.test(formData.contact)) {
+      newErrors.contact = "Please enter a valid 10-digit mobile number"
     }
 
     if (!formData.username.trim()) {
@@ -91,10 +121,10 @@ export default function Register() {
       newErrors.confirmPassword = "Passwords do not match"
     }
 
-    if (!formData.aadhaarNumber) {
-      newErrors.aadhaarNumber = "Aadhaar number is required"
-    } else if (!/^\d{12}$/.test(formData.aadhaarNumber)) {
-      newErrors.aadhaarNumber = "Aadhaar number must be 12 digits"
+    if (!formData.adharNo) {
+      newErrors.adharNo = "Aadhaar number is required"
+    } else if (!/^\d{12}$/.test(formData.adharNo)) {
+      newErrors.adharNo = "Aadhaar number must be 12 digits"
     }
 
     if (!formData.userType) {
@@ -117,20 +147,66 @@ export default function Register() {
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Create FormData for multipart/form-data request
+      const formDataToSend = new FormData()
 
-      // Mock successful registration
-      localStorage.setItem("authToken", "example-token-12345")
-      localStorage.setItem("userType", formData.userType)
-      localStorage.setItem("username", formData.username)
+      // Append all form fields
+      formDataToSend.append("fullName", formData.fullName)
+      formDataToSend.append("contact", formData.contact)
+      formDataToSend.append("username", formData.username)
+      formDataToSend.append("email", formData.email)
+      formDataToSend.append("adharNo", formData.adharNo)
+      formDataToSend.append("userType", formData.userType)
+      formDataToSend.append("password", formData.password)
+      formDataToSend.append("confirmPassword", formData.confirmPassword)
 
-      // Redirect to home page
+      // Append avatar file if selected (user profile photo)
+      if (formData.avatar) {
+        formDataToSend.append("avatar", formData.avatar)
+      }
+
+      // Make API call to your backend using axios
+      const response = await axios.post("/api/v1/users/register", formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      // Registration successful
+      console.log("Registration successful:", response.data)
+
+      // Store user data (you might want to store actual tokens from response)
+      if (response.data.data) {
+        localStorage.setItem("authToken", response.data.data.token || "temp-token")
+        localStorage.setItem("userType", formData.userType)
+        localStorage.setItem("username", formData.username)
+        localStorage.setItem("userId", response.data.data._id)
+      }
+
+      // Show success message (optional)
+      alert("Registration successful! Welcome to AgroConnect!")
+
+      // Redirect to home page or dashboard
       navigate("/")
     } catch (error) {
-      setErrors({
-        form: "Registration failed. Please try again.",
-      })
+      console.error("Registration error:", error)
+
+      if (error.response) {
+        // Server responded with error status
+        setErrors({
+          form: error.response.data?.message || "Registration failed. Please try again.",
+        })
+      } else if (error.request) {
+        // Request was made but no response received
+        setErrors({
+          form: "Network error. Please check your connection and try again.",
+        })
+      } else {
+        // Something else happened
+        setErrors({
+          form: "An unexpected error occurred. Please try again.",
+        })
+      }
     } finally {
       setIsLoading(false)
     }
@@ -157,26 +233,27 @@ export default function Register() {
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Profile Photo */}
+            {/* Profile Photo (Avatar) */}
             <div className="flex flex-col items-center">
               <div className="relative">
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-green-200">
                   {photoPreview ? (
                     <img
                       src={photoPreview || "/placeholder.svg"}
-                      alt="Profile"
+                      alt="Profile Preview"
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-3xl text-gray-400">📷</span>
                   )}
                 </div>
-                <label className="absolute bottom-0 right-0 bg-green-600 text-white p-1 rounded-full cursor-pointer hover:bg-green-700">
+                <label className="absolute bottom-0 right-0 bg-green-600 text-white p-1 rounded-full cursor-pointer hover:bg-green-700 transition-colors">
                   <span className="text-sm">✏️</span>
-                  <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                  <input type="file" accept="image/*" onChange={handlePhotoChange} name="avatar" className="hidden" />
                 </label>
               </div>
               <p className="mt-2 text-xs text-gray-500">Upload profile photo (optional)</p>
+              {errors.avatar && <p className="mt-1 text-sm text-red-600">{errors.avatar}</p>}
             </div>
 
             {/* Full Name */}
@@ -187,17 +264,17 @@ export default function Register() {
                   <span className="text-green-500">👤</span>
                 </div>
                 <input
-                  name="name"
+                  name="fullName"
                   type="text"
-                  value={formData.name}
+                  value={formData.fullName}
                   onChange={handleChange}
                   className={`pl-10 block w-full py-3 border ${
-                    errors.name ? "border-red-300" : "border-gray-300"
+                    errors.fullName ? "border-red-300" : "border-gray-300"
                   } rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
                   placeholder="Enter your full name"
                 />
               </div>
-              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+              {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
             </div>
 
             {/* Contact Number */}
@@ -208,18 +285,18 @@ export default function Register() {
                   <span className="text-green-500">📱</span>
                 </div>
                 <input
-                  name="contactNumber"
+                  name="contact"
                   type="tel"
-                  value={formData.contactNumber}
+                  value={formData.contact}
                   onChange={handleChange}
                   className={`pl-10 block w-full py-3 border ${
-                    errors.contactNumber ? "border-red-300" : "border-gray-300"
+                    errors.contact ? "border-red-300" : "border-gray-300"
                   } rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
                   placeholder="Enter 10-digit mobile number"
                   maxLength="10"
                 />
               </div>
-              {errors.contactNumber && <p className="mt-1 text-sm text-red-600">{errors.contactNumber}</p>}
+              {errors.contact && <p className="mt-1 text-sm text-red-600">{errors.contact}</p>}
             </div>
 
             {/* Username */}
@@ -272,18 +349,18 @@ export default function Register() {
                   <span className="text-green-500">🆔</span>
                 </div>
                 <input
-                  name="aadhaarNumber"
+                  name="adharNo"
                   type="text"
-                  value={formData.aadhaarNumber}
+                  value={formData.adharNo}
                   onChange={handleChange}
                   className={`pl-10 block w-full py-3 border ${
-                    errors.aadhaarNumber ? "border-red-300" : "border-gray-300"
+                    errors.adharNo ? "border-red-300" : "border-gray-300"
                   } rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
                   placeholder="12-digit Aadhaar number"
                   maxLength="12"
                 />
               </div>
-              {errors.aadhaarNumber && <p className="mt-1 text-sm text-red-600">{errors.aadhaarNumber}</p>}
+              {errors.adharNo && <p className="mt-1 text-sm text-red-600">{errors.adharNo}</p>}
             </div>
 
             {/* User Type Selection */}

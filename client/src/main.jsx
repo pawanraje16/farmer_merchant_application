@@ -18,6 +18,7 @@ import PostDetail from './pages/PostDetail.jsx'
 import ProductPost from './components/ProductPost.jsx'
 import CreatePostPrompt from './components/CreatePostPrompt.jsx'
 import CreatePost from './pages/CreatePost.jsx'
+import { FeedProvider } from './context/FeedContext.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -44,9 +45,9 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById('root')).render(
   
-    <AppContextProvider>
+    <FeedProvider>
       <RouterProvider router={router}/>
-    </AppContextProvider>
+    </FeedProvider>
     
   
 )
