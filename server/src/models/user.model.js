@@ -50,6 +50,13 @@ const userSchema = new Schema(
         required: [true, 'Password is required'],
         minlength: 6,
     },
+    contact:{
+        type: String,
+        required:true,
+        minlength: 10,
+        maxlength: 10,
+        match: [/^\d{10}$/, "Contact Number must be 10 digits"],
+    },
     refreshToken: {
         type: String
     }

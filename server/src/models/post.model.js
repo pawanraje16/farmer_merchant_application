@@ -64,7 +64,6 @@ const postSchema = new Schema(
             },
             pincode: {
                 type: String,
-                required: false
             }
         },
         tags: {
