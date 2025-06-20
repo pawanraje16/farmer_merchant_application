@@ -19,6 +19,7 @@ app.use(cookieParser())
 
 import userRouter from './routes/user.routes.js'
 import postRouter from "./routes/post.routes.js"
+import { addressRouter } from "./routes/address.route.js"
 
 // routes declaration
 app.use("/api/v1/users", userRouter)
@@ -26,5 +27,8 @@ app.use("/api/v1/users", userRouter)
 
 // post Routes
 app.use("/api/v1/post", postRouter)
+
+// address Routes
+app.use("/api/v1/address",addressRouter)
 
 export { app }

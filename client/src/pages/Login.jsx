@@ -1,7 +1,9 @@
-// "use client"
+
 
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
+import toast from "react-hot-toast"
 
 const Login = () => {
   const navigate = useNavigate()
@@ -12,6 +14,8 @@ const Login = () => {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+
+  const {login,setUser} = useAuth()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -54,14 +58,11 @@ const Login = () => {
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Mock successful login
-      localStorage.setItem("authToken", "example-token-12345")
-
-      // Redirect to home page
-      navigate("/")
+      
+     const newUser =  await login(formData)
+      if(newUser)
+      {navigate("/")}
+      else toast.error("user not found+jgyj");
     } catch (error) {
       setErrors({
         form: "Invalid email or password. Please try again.",
@@ -90,8 +91,10 @@ const Login = () => {
               <p className="text-red-700">{errors.form}</p>
             </div>
           )}
-
+            
           <form className="space-y-6" onSubmit={handleSubmit}>
+
+            {/* email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -115,7 +118,7 @@ const Login = () => {
               </div>
               {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
             </div>
-
+            {/* password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password

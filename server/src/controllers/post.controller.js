@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Post } from "../models/post.model.js";
+import { User } from "../models/user.model.js";
 
 
 
@@ -125,16 +126,40 @@ const getPostById = asyncHandler ( async (req, res) => {
 const getAllPosts = asyncHandler (async (req, res) => {
   const posts = await Post.find({})
   .sort({ createdAt: -1})
-  .populate("author", "fullName avatar")
+  .populate("author", "fullName avatar username")
   .lean();
-
+  console.log(posts)
   res.status(200)
   .json(new ApiResponse (200, posts, "All posts fetched"));
 });
 
+const getLoggedInUserPosts = asyncHandler (async(req, res)=> {
+  const userId = req.user?._id;
+  const posts = await Post.find({ author: userId}).sort({createdAt: -1});
+  console.log(posts);
+  res
+  .status(200)
+  .json(new ApiResponse(200, posts, "User posts Fetched"))
+})
+
+const getUserPosts = asyncHandler (async (req, res) => {
+       const{ username} = req.params;
+       const user = await User.findOne({username}).select("_id").lean();
+
+       if (!user) {
+        throw new ApiError(404, "User Not found while fetching the uesr posts");
+       }
+       const posts = await Post.find({ author: user._id}).sort({createdAt: -1});
+       console.log(posts);
+       res
+       .status(200)
+       .json(new ApiResponse(200, posts, "User posts Fetched"))
+})
 
 export {
   createPost,
   getPostById,
-  getAllPosts
+  getAllPosts,
+  getLoggedInUserPosts,
+  getUserPosts
 }

@@ -22,7 +22,7 @@ const ProductPost = ({ post }) => {
   return (
     <div className="group bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200 relative overflow-hidden">
       {/* Featured Badge */}
-      {post.isFeatured && (
+      {post?.isFeatured && (
         <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
           ⭐ Featured
         </div>
@@ -32,7 +32,7 @@ const ProductPost = ({ post }) => {
         {/* Post Images */}
         <div className="lg:w-1/3">
           <div className="grid grid-cols-2 gap-3">
-            {post.images.slice(0, 4).map((image, index) => (
+            {post?.images.slice(0, 4).map((image, index) => (
               <div
                 key={index}
                 className="relative rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all"

@@ -25,42 +25,54 @@ const UserProfileHeader = ({
   return (
     <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mb-8 border border-gray-100">
       {/* Cover Photo with Gradient Overlay */}
-      <div className="relative h-64 md:h-80">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-green-500 to-blue-500"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+      <div className="relative h-80 md:h-[28rem] lg:h-[32rem]">
+  {/* Background Cover Image or Default Gradient */}
+  {userProfile?.coverImage ? (
+    <img
+      src={userProfile.coverImage}
+      alt="Cover"
+      className="absolute inset-0 w-full h-full object-cover object-center"
+    />
+  ) : (
+    <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-green-500 to-blue-500" />
+  )}
 
-        {/* Floating Elements */}
-        <div className="absolute top-6 right-6 flex space-x-2">
-          {userProfile?.isOnline && (
-            <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 backdrop-blur-sm bg-opacity-90">
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <span>Online</span>
-            </div>
-          )}
-          {userProfile?.isVerified && (
-            <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm bg-opacity-90">
-              ✓ Verified
-            </div>
-          )}
-        </div>
+  {/* Dark overlay for text readability */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
-        {/* Profile Info Overlay */}
-        <div className="absolute bottom-6 left-6 text-white">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">{userProfile?.fullName}</h1>
-          <div className="flex items-center space-x-4 text-green-100">
-            <span className="flex items-center space-x-1">
-              <span>@</span>
-              <span>{userProfile?.username}</span>
-            </span>
-            <span className="flex items-center space-x-1">
-              <span>📍</span>
-              <span>
-                {userProfile?.location?.city}, {userProfile?.location?.state}
-              </span>
-            </span>
-          </div>
-        </div>
+  {/* Floating Elements */}
+  <div className="absolute top-6 right-6 flex space-x-2">
+    {userProfile?.isOnline && (
+      <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 backdrop-blur-sm bg-opacity-90">
+        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        <span>Online</span>
       </div>
+    )}
+    {userProfile?.isVerified && (
+      <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm bg-opacity-90">
+        ✓ Verified
+      </div>
+    )}
+  </div>
+
+  {/* Profile Info Overlay */}
+  <div className="absolute bottom-6 left-6 text-white">
+    <h1 className="text-3xl md:text-4xl font-bold mb-2">{userProfile?.fullName}</h1>
+    <div className="flex items-center space-x-4 text-green-100">
+      <span className="flex items-center space-x-1">
+        <span>@</span>
+        <span>{userProfile?.username}</span>
+      </span>
+      <span className="flex items-center space-x-1">
+        <span>📍</span>
+        <span>
+          {userProfile?.address?.city}, {userProfile?.address?.state}
+        </span>
+      </span>
+    </div>
+  </div>
+</div>
+
 
       {/* Profile Content */}
       <div className="px-6 md:px-8 py-8">
@@ -70,7 +82,7 @@ const UserProfileHeader = ({
             <div className="relative group">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white flex items-center justify-center">
                 <img
-                  src={userProfile?.profilePhoto || "/placeholder.svg?height=160&width=160"}
+                  src={userProfile?.avatar || "/placeholder.svg?height=160&width=160"}
                   alt="Profile"
                   className="max-w-full max-h-full object-contain object-center"
                 />
@@ -97,7 +109,7 @@ const UserProfileHeader = ({
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                 <span className="flex items-center space-x-1">
                   <span>📅</span>
-                  <span>Joined {formatDate(userProfile?.joinedDate)}</span>
+                  <span>Joined {formatDate(userProfile?.createdAt)}</span>
                 </span>
                 <span className="flex items-center space-x-1">
                   <span>🌾</span>

@@ -1,10 +1,13 @@
 
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import ProductPost from "../components/ProductPost"
-import pawanImage from "./profilePhoto/pawan.png"; // relative path from Profile.jsx
 import { fruits, proPhoto } from "../assets/assets";
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
+import toast from "react-hot-toast";
+import LocationCard from "../components/LocationCart";
 
 
 const Profile = () => {
@@ -15,278 +18,22 @@ const Profile = () => {
   const [userPosts, setUserPosts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [editForm, setEditForm] = useState({})
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const fileInputRef = useRef();
+  const {user} =useAuth()
 
-  // Mock user data with enhanced structure
-  const mockUserProfile = {
-    _id: "user123",
-    username: "farmer_raj",
-    email: "raj@example.com",
-    userType: "farmer",
-    majorProduct: "Rice, Wheat, Organic Vegetables",
-    profilePhoto: proPhoto.ram,
-    coverPhoto: "/placeholder.svg?height=300&width=800",
-    fullName: "Raj Kumar Singh",
-    aadhaarNumber: "1234****5678",
-    location: {
-      state: "Punjab",
-      district: "Ludhiana",
-      city: "Ludhiana",
-      pincode: "141001",
-    },
-    bio: "🌾 Passionate organic farmer with 10+ years of experience. Specializing in sustainable agriculture and premium quality rice & wheat cultivation. Committed to providing chemical-free, healthy food to families across India.",
-    farmDetails: {
-      farmSize: "15 acres",
-      farmingType: "Organic",
-      experience: "10+ years",
-      certifications: ["Organic Certified", "Fair Trade"],
-    },
-    businessDetails: {
-      businessName: "Raj Organic Farm",
-      gstNumber: "GST123456789",
-      businessType: "Individual Farmer",
-    },
-    contactInfo: {
-      phone: "9876543210",
-      whatsapp: "9876543210",
-      alternatePhone: "",
-    },
-    socialStats: {
-      totalPosts: 8, // Updated from 24 to 8 to match actual posts
-      followers: 1256,
-      following: 189,
-      rating: 4.8,
-      totalReviews: 143,
-    },
-    achievements: [
-      { title: "Top Seller", icon: "🏆", description: "Best seller this month" },
-      { title: "Verified Farmer", icon: "✅", description: "Identity verified" },
-      { title: "Quality Producer", icon: "⭐", description: "5-star rated products" },
-    ],
-    joinedDate: "2023-06-15",
-    isVerified: true,
-    isOnline: true,
-    lastActive: "2024-01-15T10:30:00Z",
-  }
-
-  const mockUserPosts = [
-    {
-      _id: "feed_post_7",
-      title: "Premium Organic Basmati Rice - Farm Fresh",
-      description:
-        "Freshly harvested premium basmati rice from my organic farm. No chemicals, no pesticides. Perfect for healthy cooking and special occasions.",
-      images: [
-        fruits.pomo[0],
-        fruits.pomo[1],
-        fruits.pomo[2],
-      ],
-      price: 85,
-      priceUnit: "per kg",
-      originalPrice: 95,
-      category: "Grains",
-      quantity: "500 kg available",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: true,
-      isFeatured: true,
-      createdAt: "2024-01-10T08:00:00Z",
-      likes: 45,
-      comments: 12,
-      views: 234,
-      tags: ["organic", "premium", "basmati"],
-    },
-    {
-      _id: "post2",
-      title: "Fresh Wheat Flour - Stone Ground",
-      description:
-        "Traditional stone-ground wheat flour made from our premium wheat. Rich in nutrients and perfect for making rotis, bread, and other delicacies.",
-      images: ["/placeholder.svg?height=300&width=400", "/placeholder.svg?height=300&width=400"],
-      price: 45,
-      priceUnit: "per kg",
-      originalPrice: 50,
-      category: "Grains",
-      quantity: "200 kg available",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: true,
-      isFeatured: false,
-      createdAt: "2024-01-08T14:30:00Z",
-      likes: 28,
-      comments: 8,
-      views: 156,
-      tags: ["wheat", "flour", "traditional"],
-    },
-    {
-      _id: "post3",
-      title: "Fresh Organic Tomatoes - Vine Ripened",
-      description:
-        "Juicy, vine-ripened organic tomatoes grown without any chemicals. Perfect for cooking, salads, and making fresh sauces. Harvested this morning!",
-      images: [
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
-      ],
-      price: 60,
-      priceUnit: "per kg",
-      originalPrice: null,
-      category: "Vegetables",
-      quantity: "100 kg available",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: true,
-      isFeatured: true,
-      createdAt: "2024-01-12T06:00:00Z",
-      likes: 67,
-      comments: 15,
-      views: 289,
-      tags: ["organic", "fresh", "tomatoes", "vegetables"],
-    },
-    {
-      _id: "post4",
-      title: "Pure Desi Cow Milk - Daily Fresh",
-      description:
-        "Fresh, pure desi cow milk delivered daily. Our cows are grass-fed and healthy. Rich in nutrients and completely natural. Home delivery available.",
-      images: ["/placeholder.svg?height=300&width=400", "/placeholder.svg?height=300&width=400"],
-      price: 70,
-      priceUnit: "per liter",
-      originalPrice: null,
-      category: "Dairy",
-      quantity: "50 liters daily",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: true,
-      isFeatured: false,
-      createdAt: "2024-01-11T05:30:00Z",
-      likes: 34,
-      comments: 9,
-      views: 178,
-      tags: ["milk", "desi", "cow", "fresh", "daily"],
-    },
-    {
-      _id: "post5",
-      title: "Seasonal Mixed Vegetables Box",
-      description:
-        "Fresh seasonal vegetables box containing potatoes, onions, carrots, cabbage, and green beans. All organically grown on our farm. Perfect for families.",
-      images: [
-        "https://images.app.goo.gl/DYXBxqjZX46cbpN4A",
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
-      ],
-      price: 250,
-      priceUnit: "per box (5kg)",
-      originalPrice: 300,
-      category: "Vegetables",
-      quantity: "30 boxes available",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: true,
-      isFeatured: false,
-      createdAt: "2024-01-09T16:45:00Z",
-      likes: 23,
-      comments: 6,
-      views: 145,
-      tags: ["vegetables", "mixed", "seasonal", "family", "box"],
-    },
-    {
-      _id: "post6",
-      title: "Premium Mustard Oil - Cold Pressed",
-      description:
-        "Pure, cold-pressed mustard oil made from our own mustard seeds. Traditional wooden press method ensures maximum nutrition and authentic taste.",
-      images: ["/placeholder.svg?height=300&width=400"],
-      price: 180,
-      priceUnit: "per liter",
-      originalPrice: 200,
-      category: "Oil & Spices",
-      quantity: "25 liters available",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: true,
-      isFeatured: true,
-      createdAt: "2024-01-07T12:00:00Z",
-      likes: 41,
-      comments: 11,
-      views: 203,
-      tags: ["mustard", "oil", "cold-pressed", "traditional", "pure"],
-    },
-    {
-      _id: "post7",
-      title: "Fresh Farm Eggs - Free Range",
-      description:
-        "Fresh eggs from our free-range chickens. The chickens roam freely and eat natural feed. Rich in protein and completely natural. Collected daily.",
-      images: ["/placeholder.svg?height=300&width=400", "/placeholder.svg?height=300&width=400"],
-      price: 8,
-      priceUnit: "per piece",
-      originalPrice: null,
-      category: "Poultry",
-      quantity: "200 eggs available",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: true,
-      isFeatured: false,
-      createdAt: "2024-01-13T07:15:00Z",
-      likes: 19,
-      comments: 4,
-      views: 98,
-      tags: ["eggs", "free-range", "fresh", "daily", "protein"],
-    },
-    {
-      _id: "post8",
-      title: "Organic Jaggery (Gur) - Traditional",
-      description:
-        "Pure organic jaggery made from our sugarcane using traditional methods. No chemicals or artificial additives. Rich in iron and minerals. Perfect for winter.",
-      images: [
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
-        "/placeholder.svg?height=300&width=400",
-      ],
-      price: 120,
-      priceUnit: "per kg",
-      originalPrice: null,
-      category: "Sweeteners",
-      quantity: "80 kg available",
-      location: {
-        state: "Punjab",
-        district: "Ludhiana",
-        city: "Ludhiana",
-      },
-      isAvailable: false, // Sold out example
-      isFeatured: false,
-      createdAt: "2024-01-05T14:20:00Z",
-      likes: 52,
-      comments: 18,
-      views: 267,
-      tags: ["jaggery", "gur", "organic", "traditional", "sugarcane"],
-    },
-  ]
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
+  
+  const fetchUserProfile = async () => {
       setIsLoading(true)
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setUserProfile(mockUserProfile)
-        setUserPosts(mockUserPosts)
+        const response = await api.get("/api/v1/users/profile")
+        const {data} =response
+        console.log(data);
+        if(data?.success)toast.success("userfetched")
+        console.log(data.data)
+        setUserProfile(data.data)
+        // setUserPosts(mockUserPosts)
         setEditForm(mockUserProfile)
       } catch (error) {
         console.error("Error fetching profile:", error)
@@ -294,8 +41,70 @@ const Profile = () => {
         setIsLoading(false)
       }
     }
+  
+    const fetchUserPosts = async () => {
+      setIsLoading(true)
+      try {
+        const response = await api.get("/api/v1/post/current-posts");
+        const {data} = response;
+        if(data?.success)toast.success("posts fetched")
+        setUserPosts(data.data)
+        
+      } catch (error) {
+        console.error("Error fetching the profile posts", error)
+      } finally{
+        setIsLoading(false)
+      }
+    }
 
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files[0];
+    if(!file) return ;
+
+    // Show local preview instantly
+    const previewURL = URL.createObjectURL(file);
+    setPreviewImage(previewURL);
+    setCoverUploading(true);
+
+    const formData = new FormData();
+    formData.append("coverImage",file);
+
+    try {
+     const {data} =  await api.patch("/api/v1/users/cover-image", formData, {
+        headers:  {"Content-Type": "multipart/form-data"},
+      });
+
+      //Pre-load cloud image before swapping
+      const cloudURL = data.data;
+      const img= new Image();
+      img.src = cloudURL;
+
+      img.onload = () => {
+        setUserProfile((prev) => ({...prev, coverImage: cloudURL}));
+        setPreviewImage(null);
+        URL.revokeObjectURL(previewURL);
+        setCoverUploading(false);
+        toast.success("Cover Image updated!");
+      };
+
+      img.onerror= () => {
+        URL.revokeObjectURL(previewURL);
+        setPreviewImage(null);
+        setCoverUploading(false);
+        toast.error("Failed to load updated image.");
+      };      
+    } catch (err) {
+      toast.error("Upload failed");
+      setPreviewImage(null);
+      URL.revokeObjectURL(previewURL);
+      setCoverUploading(false)
+    } 
+  };
+
+
+  useEffect(() => {
     fetchUserProfile()
+    fetchUserPosts()
   }, [])
 
   const handleEditSubmit = async (e) => {
@@ -368,29 +177,49 @@ const Profile = () => {
   }
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+      
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Enhanced Profile Header */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mb-8 border border-gray-100">
           {/* Cover Photo with Gradient Overlay */}
-          <div className="relative h-64 md:h-80">
-            <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-green-500 to-blue-500"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+          <div className="relative h-80 md:h-[28rem] lg:h-[32rem]">
+          {userProfile?.coverImage ? (
+              <img
+               src={previewImage || userProfile?.coverImage}
+               alt="Cover"
+               className="absolute inset-0 w-full h-full object-cover"
+               />
+            ) :(
+              <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-green-500 to-blue-500"></div>
+            )}
 
-            {/* Floating Elements */}
-            <div className="absolute top-6 right-6 flex space-x-2">
-              {userProfile?.isOnline && (
-                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 backdrop-blur-sm bg-opacity-90">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                  <span>Online</span>
+              {/* ✅ Loader Overlay */}
+              {coverUploading && (
+                <div className="absolute inset-0 bg-white/40 flex justify-center items-center z-10">
+                  <div className="loader border-4 border-green-600 rounded-full animate-spin h-10 w-10 border-t-transparent"></div>
                 </div>
               )}
-              {userProfile?.isVerified && (
-                <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm bg-opacity-90">
-                  ✓ Verified
-                </div>
-              )}
-            </div>
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+            
+            {/* Upload Button  */}
+
+            <button
+            onClick={() => fileInputRef.current.click()}
+            className="absolute bottom-4 right-4 px-3 py-1 text-sm bg-white text-gray-700 rounded shadow hover:bg-gray-100"
+            >
+              {userProfile?.coverImage ? "Edit Cover" : " Add Cover"}
+            </button>
+            <input
+            type="file"
+            accept="image/*"
+            onChange={handleCoverUpload}
+            ref={fileInputRef}
+            className="hidden"
+            />
+            
 
             {/* Profile Info Overlay */}
             <div className="absolute bottom-6 left-6 text-white">
@@ -403,11 +232,12 @@ const Profile = () => {
                 <span className="flex items-center space-x-1">
                   <span>📍</span>
                   <span>
-                    {userProfile?.location?.city}, {userProfile?.location?.state}
+                    {userProfile?.address?.city}, {userProfile?.address?.state}
                   </span>
                 </span>
               </div>
             </div>
+
           </div>
 
           {/* Profile Content */}
@@ -418,7 +248,7 @@ const Profile = () => {
                 <div className="relative group">
                   <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-white shadow-2xl overflow-hidden bg-gradient-to-br from-green-400 to-blue-500 p-1">
                     <img
-                      src={userProfile?.profilePhoto || "https://images.app.goo.gl/DYXBxqjZX46cbpN4A"}
+                      src={userProfile?.avatar || "https://images.app.goo.gl/DYXBxqjZX46cbpN4A"}
                       alt="Profile"
                       className="w-full h-full object-cover rounded-2xl"
                     />
@@ -445,7 +275,7 @@ const Profile = () => {
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                     <span className="flex items-center space-x-1">
                       <span>📅</span>
-                      <span>Joined {formatDate(userProfile?.joinedDate)}</span>
+                      <span>Joined {formatDate(userProfile?.createdAt)}</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <span>🌾</span>
@@ -579,7 +409,7 @@ const Profile = () => {
                     {[
                       { label: "Full Name", value: userProfile?.fullName, icon: "👨‍🌾" },
                       { label: "Email", value: userProfile?.email, icon: "✉️" },
-                      { label: "Phone", value: userProfile?.contactInfo?.phone, icon: "📱" },
+                      { label: "Phone", value: userProfile?.contact, icon: "📱" },
                       { label: "Aadhaar", value: userProfile?.aadhaarNumber, icon: "🆔" },
                     ].map((item, index) => (
                       <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm">
@@ -625,28 +455,10 @@ const Profile = () => {
                 </div>
 
                 {/* Location Information Card */}
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-6 border border-purple-100">
-                  <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
-                    <span className="text-2xl">📍</span>
-                    <span>Location Details</span>
-                  </h3>
-                  <div className="space-y-4">
-                    {[
-                      { label: "State", value: userProfile?.location?.state, icon: "🗺️" },
-                      { label: "District", value: userProfile?.location?.district, icon: "🏘️" },
-                      { label: "City", value: userProfile?.location?.city, icon: "🏙️" },
-                      { label: "Pincode", value: userProfile?.location?.pincode, icon: "📮" },
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm">
-                        <span className="text-xl">{item.icon}</span>
-                        <div>
-                          <div className="text-sm font-medium text-gray-500">{item.label}</div>
-                          <div className="text-gray-900 font-medium">{item.value}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+               <LocationCard
+               userProfile={userProfile}
+               refreshProfile={fetchUserProfile}
+               />
 
                 {/* Certifications Card */}
                 <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-6 border border-yellow-100">

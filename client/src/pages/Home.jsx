@@ -9,27 +9,24 @@ import PageHeader from "../components/PageHeader"
 import LoadingSpinner from "../components/LoadingSpinner"
 import EmptyState from "../components/EmptyState"
 import { useFeed } from "../context/FeedContext"
+import { usePost } from "../context/PostContext"
+import { useAuth } from "../context/AuthContext"
 
 const Home = () => {
   const navigate = useNavigate()
-  // const [posts, setPosts] = useState([])
-  // const [isLoading, setIsLoading] = useState(true)
-  // const [filters, setFilters] = useState({
-  //   category: "all",
-  //   location: "all",
-  //   priceRange: "all",
-  //   sortBy: "latest",
-  // })
+ 
 
-   const {posts,setPosts,isLoading,setIsLoading
+   const {setPosts,isLoading,setIsLoading
   ,filters,mockFeedPosts}=useFeed()
-
-
+   
+  const {fetchPosts,posts} = usePost()
+  const {user,loadingAuth} = useAuth();
 
 
 
 
   useEffect(() => {
+    
     const loadFeedPosts = async () => {
       setIsLoading(true)
       try {
@@ -42,7 +39,7 @@ const Home = () => {
         setIsLoading(false)
       }
     }
-
+    fetchPosts()
     loadFeedPosts()
   }, [])
 
@@ -66,6 +63,7 @@ const Home = () => {
   }
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Welcome Header */}

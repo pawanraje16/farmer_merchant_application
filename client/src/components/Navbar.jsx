@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
-import { useAppContext } from "../context/AppContext"
+import { useAuth } from "../context/AuthContext";
+
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate();
+  const {logout} = useAuth()
 
   const handleProfile = () => {
     navigate("/Profile")
@@ -17,7 +19,7 @@ const Navbar = () => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken")
+    logout()
     navigate("/Login")
   }
 

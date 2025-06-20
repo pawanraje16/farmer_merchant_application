@@ -8,6 +8,7 @@ import PageHeader from "../components/PageHeader"
 import LoadingSpinner from "../components/LoadingSpinner"
 import EmptyState from "../components/EmptyState"
 import { useFeed } from "../context/FeedContext"
+import { usePost } from "../context/PostContext"
 
 const Crops = () => {
   const navigate = useNavigate()
@@ -26,7 +27,8 @@ const Crops = () => {
   // })
 
 
-  const {posts, setPosts, filteredPosts, setFilteredPosts, isLoading, setIsLoading, filters, setFilters,mockFeedPosts}=useFeed();
+  const {filteredPosts, setFilteredPosts, isLoading, setIsLoading, filters, setFilters,mockFeedPosts}=useFeed();
+  const {posts} = usePost();
 
   useEffect(() => {
     const loadPosts = async () => {

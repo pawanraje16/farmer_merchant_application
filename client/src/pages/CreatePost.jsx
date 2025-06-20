@@ -1,10 +1,12 @@
-"use client"
 
 import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { Upload, X, Check, MapPin, Package, Tag } from "lucide-react"
+import { Upload, X, MapPin, Package, Tag } from "lucide-react"
+import toast, { Toaster } from "react-hot-toast"
+import { useFeed } from "../context/FeedContext"
 
 const CreatePost = () => {
+  const {axios} = useFeed()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
   const [loading, setLoading] = useState(false)
@@ -22,8 +24,8 @@ const CreatePost = () => {
       state: "",
       district: "",
       city: "",
+      village: "",
       pincode: "",
-      address: "",
     },
     isOrganic: false,
     isFeatured: false,
@@ -31,13 +33,12 @@ const CreatePost = () => {
     specifications: {
       variety: "",
       harvestDate: "",
-      shelfLife: "",
-      minOrderQuantity: "",
+      shelLife: "", // Keep this as shelLife to match backend
+      minorderQunatity: "", // Keep this spelling to match backend
       packaging: "",
     },
   })
   const [previewImages, setPreviewImages] = useState([])
-  const [successMessage, setSuccessMessage] = useState("")
   const [currentTag, setCurrentTag] = useState("")
 
   const categories = [
@@ -107,10 +108,24 @@ const CreatePost = () => {
   }
 
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files)
-    const newPreviewImages = files.map((file) => URL.createObjectURL(file))
-    setPreviewImages([...previewImages, ...newPreviewImages])
-    setImages([...images, ...files])
+    const files = Array.from(e.target.files || [])
+
+    // Validate file size (max 10MB per file)
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    const validFiles = files.filter((file) => {
+      if (file.size > maxSize) {
+        toast.error(`File ${file.name} is too large. Maximum size is 10MB.`)
+        return false
+      }
+      return true
+    })
+
+    if (validFiles.length > 0) {
+      const newPreviewImages = validFiles.map((file) => URL.createObjectURL(file))
+      setPreviewImages([...previewImages, ...newPreviewImages])
+      setImages([...images, ...validFiles])
+      toast.success(`${validFiles.length} image(s) added successfully`)
+    }
   }
 
   const removeImage = (index) => {
@@ -122,6 +137,7 @@ const CreatePost = () => {
     const newImages = [...images]
     newImages.splice(index, 1)
     setImages(newImages)
+    toast.success("Image removed")
   }
 
   const addTag = () => {
@@ -131,6 +147,9 @@ const CreatePost = () => {
         tags: [...prev.tags, currentTag.trim().toLowerCase()],
       }))
       setCurrentTag("")
+      toast.success("Tag added")
+    } else if (formData.tags.includes(currentTag.trim().toLowerCase())) {
+      toast.error("Tag already exists")
     }
   }
 
@@ -139,80 +158,155 @@ const CreatePost = () => {
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }))
+    toast.success("Tag removed")
+  }
+
+  const validateForm = () => {
+    const requiredFields = [
+      { field: formData.title, name: "Title" },
+      { field: formData.description, name: "Description" },
+      { field: formData.price, name: "Price" },
+      { field: formData.category, name: "Category" },
+      { field: formData.cropType, name: "Crop Type" },
+      { field: formData.quantity, name: "Quantity" },
+      { field: formData.location.state, name: "State" },
+      { field: formData.location.district, name: "District" },
+      { field: formData.location.city, name: "City" },
+      { field: formData.location.village, name: "Village" },
+      { field: formData.location.pincode, name: "Pincode" },
+      { field: formData.specifications.shelLife, name: "Shelf Life" },
+    ]
+
+    for (const { field, name } of requiredFields) {
+      if (!field || !field.toString().trim()) {
+        toast.error(`${name} is required`)
+        return false
+      }
+    }
+
+    if (images.length === 0) {
+      toast.error("At least one product image is required")
+      return false
+    }
+
+    return true
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    console.log("Form data before validation:", formData) // Debug log
+
+    if (!validateForm()) {
+      return
+    }
+
     setLoading(true)
+    const loadingToast = toast.loading("Creating your post...")
 
     try {
-      // Create the post data structure matching your mock data
-      const postData = {
-        ...formData,
-        images: previewImages, // In real app, these would be uploaded URLs
-        isAvailable: true,
-        createdAt: new Date().toISOString(),
-        likes: 0,
-        comments: 0,
-        views: 0,
-        author: {
-          // This would come from authenticated user context
-          _id: "current_user_id",
-          username: "current_username",
-          fullName: "Current User Name",
-          profilePhoto: "/placeholder.svg",
-          userType: "farmer",
-          isVerified: false,
-          rating: 0,
-          totalReviews: 0,
-          location: `${formData.location.city}, ${formData.location.state}`,
-          memberSince: new Date().getFullYear().toString(),
-        },
+      // Create FormData for multipart/form-data
+      const postFormData = new FormData()
+
+      // Append all form fields exactly as expected by backend
+      postFormData.append("title", formData.title)
+      postFormData.append("description", formData.description)
+      postFormData.append("price", formData.price)
+      postFormData.append("priceUnit", formData.priceUnit)
+      postFormData.append("category", formData.category)
+      postFormData.append("cropType", formData.cropType)
+      postFormData.append("quantity", formData.quantity)
+
+      // Location fields (flattened as individual fields)
+      postFormData.append("state", formData.location.state)
+      postFormData.append("district", formData.location.district)
+      postFormData.append("city", formData.location.city)
+      postFormData.append("village", formData.location.village)
+      postFormData.append("pincode", formData.location.pincode)
+
+      // Specifications fields (flattened as individual fields)
+      postFormData.append("variety", formData.specifications.variety)
+      postFormData.append("shelLife", formData.specifications.shelLife)
+      postFormData.append("packaging", formData.specifications.packaging)
+      postFormData.append("minorderQunatity", formData.specifications.minorderQunatity)
+
+      // Tags as comma-separated string (as expected by backend)
+      postFormData.append("tags", formData.tags.join(","))
+
+      // Append images
+      images.forEach((image) => {
+        postFormData.append("images", image)
+      })
+
+      // Debug: Log what we're sending
+      console.log("Sending to backend:")
+      for (const [key, value] of postFormData.entries()) {
+        console.log(key, value)
       }
 
-      console.log("Post data:", postData)
+      // Make API call
+      const response = await axios.post("/api/v1/post/create-post", postFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: 30000, // 30 seconds
+      })
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      toast.dismiss(loadingToast)
+      toast.success("Post created successfully! 🎉")
 
-      setSuccessMessage("Post created successfully!")
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        price: "",
+        priceUnit: "per kg",
+        originalPrice: "",
+        category: "",
+        cropType: "",
+        quantity: "",
+        location: {
+          state: "",
+          district: "",
+          city: "",
+          village: "",
+          pincode: "",
+        },
+        isOrganic: false,
+        isFeatured: false,
+        tags: [],
+        specifications: {
+          variety: "",
+          harvestDate: "",
+          shelLife: "",
+          minorderQunatity: "",
+          packaging: "",
+        },
+      })
+      setImages([])
+      setPreviewImages([])
 
+      // Navigate after a short delay
       setTimeout(() => {
-        setFormData({
-          title: "",
-          description: "",
-          price: "",
-          priceUnit: "per kg",
-          originalPrice: "",
-          category: "",
-          cropType: "",
-          quantity: "",
-          location: {
-            state: "",
-            district: "",
-            city: "",
-            pincode: "",
-            address: "",
-          },
-          isOrganic: false,
-          isFeatured: false,
-          tags: [],
-          specifications: {
-            variety: "",
-            harvestDate: "",
-            shelfLife: "",
-            minOrderQuantity: "",
-            packaging: "",
-          },
-        })
-        setImages([])
-        setPreviewImages([])
-        setSuccessMessage("")
         navigate("/")
-      }, 2000)
+      }, 1500)
     } catch (error) {
-      console.error("Error creating post:", error)
-      alert("Failed to create post. Please try again.")
+      toast.dismiss(loadingToast)
+
+      if (error.response) {
+        // Server responded with error status
+        const errorMessage = error.response.data?.message || "Failed to create post"
+        toast.error(errorMessage)
+        console.error("Server error:", error.response.data)
+      } else if (error.request) {
+        // Request was made but no response received
+        toast.error("Network error. Please check your connection.")
+        console.error("Network error:", error.request)
+      } else {
+        // Something else happened
+        toast.error("An unexpected error occurred")
+        console.error("Error:", error.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -220,18 +314,36 @@ const CreatePost = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
+      {/* <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: "#10B981",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: "#EF4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      /> */}
+
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
           <Package className="mr-3 h-8 w-8 text-green-600" />
           Create New Post
         </h1>
-
-        {successMessage && (
-          <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
-            <Check className="h-5 w-5 mr-2" />
-            {successMessage}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
@@ -294,7 +406,7 @@ const CreatePost = () => {
                 </div>
                 <div>
                   <label htmlFor="cropType" className="block text-sm font-medium text-gray-700 mb-1">
-                    Crop Type
+                    Crop Type *
                   </label>
                   <input
                     type="text"
@@ -302,6 +414,7 @@ const CreatePost = () => {
                     name="cropType"
                     value={formData.cropType}
                     onChange={handleInputChange}
+                    required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., Carrot, Wheat, Rice"
                   />
@@ -328,6 +441,8 @@ const CreatePost = () => {
                     value={formData.price}
                     onChange={handleInputChange}
                     required
+                    min="0"
+                    step="0.01"
                     className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="35"
                   />
@@ -364,6 +479,8 @@ const CreatePost = () => {
                     name="originalPrice"
                     value={formData.originalPrice}
                     onChange={handleInputChange}
+                    min="0"
+                    step="0.01"
                     className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="40"
                   />
@@ -457,24 +574,25 @@ const CreatePost = () => {
                   value={formData.location.pincode}
                   onChange={handleInputChange}
                   required
+                  pattern="[0-9]{6}"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 171001"
                 />
               </div>
             </div>
             <div className="mt-4">
-              <label htmlFor="location.address" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Address *
+              <label htmlFor="location.village" className="block text-sm font-medium text-gray-700 mb-1">
+                Village *
               </label>
-              <textarea
-                id="location.address"
-                name="location.address"
-                value={formData.location.address}
+              <input
+                type="text"
+                id="location.village"
+                name="location.village"
+                value={formData.location.village}
                 onChange={handleInputChange}
                 required
-                rows={2}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                placeholder="e.g., Village Narkanda, Near Old Market"
+                placeholder="e.g., Narkanda"
               />
             </div>
           </div>
@@ -513,31 +631,32 @@ const CreatePost = () => {
                 />
               </div>
               <div>
-                <label htmlFor="specifications.shelfLife" className="block text-sm font-medium text-gray-700 mb-1">
-                  Shelf Life
+                <label htmlFor="specifications.shelLife" className="block text-sm font-medium text-gray-700 mb-1">
+                  Shelf Life *
                 </label>
                 <input
                   type="text"
-                  id="specifications.shelfLife"
-                  name="specifications.shelfLife"
-                  value={formData.specifications.shelfLife}
+                  id="specifications.shelLife"
+                  name="specifications.shelLife"
+                  value={formData.specifications.shelLife}
                   onChange={handleInputChange}
+                  required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 1 month"
                 />
               </div>
               <div>
                 <label
-                  htmlFor="specifications.minOrderQuantity"
+                  htmlFor="specifications.minorderQunatity"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Minimum Order Quantity
                 </label>
                 <input
                   type="text"
-                  id="specifications.minOrderQuantity"
-                  name="specifications.minOrderQuantity"
-                  value={formData.specifications.minOrderQuantity}
+                  id="specifications.minorderQunatity"
+                  name="specifications.minorderQunatity"
+                  value={formData.specifications.minorderQunatity}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 10 kg"
@@ -633,11 +752,11 @@ const CreatePost = () => {
 
           {/* Image Upload */}
           <div className="bg-gray-50 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Product Images</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Product Images *</h2>
 
             <div
               className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => fileInputRef.current.click()}
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
             >
               <input
                 type="file"
@@ -654,7 +773,7 @@ const CreatePost = () => {
 
             {previewImages.length > 0 && (
               <div className="mt-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Image Previews</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Image Previews ({previewImages.length})</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                   {previewImages.map((image, index) => (
                     <div key={index} className="relative group">
@@ -682,7 +801,8 @@ const CreatePost = () => {
             <button
               type="button"
               onClick={() => navigate("/")}
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+              disabled={loading}
+              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>

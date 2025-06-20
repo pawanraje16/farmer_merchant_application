@@ -7,9 +7,12 @@ import UserPosts from "../components/UserPosts"
 import UserAbout from "../components/UserAbout"
 import UserReviews from "../components/UserReviews"
 import { useFeed } from "../context/FeedContext"
+import { usePost } from "../context/PostContext"
+import toast from "react-hot-toast"
+import api from "../utils/api"
 
 const PublicProfile = () => {
-  const { userId } = useParams()
+  const { username } = useParams()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("posts")
   const [userProfile, setUserProfile] = useState(null)
@@ -19,36 +22,28 @@ const PublicProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [error, setError] = useState("");
+  console.log('[PublicProfile] username param =>', username);
 
   //debuggig
   const {mockFeedPosts,mockPublicProfile,mockPublicPosts,mockReviews}=useFeed();
-  const user = mockFeedPosts.filter(post => post.author._id === userId);
-  const profile= mockPublicProfile.find(user => user._id== userId);
+  const {posts} = usePost()
   
-
- 
-
- 
- 
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
+      const fetchUserProfile = async () => {
       setIsLoading(true)
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        console.log(userId);
-         
-        if(!profile){
-          setError("User profile not found.");
-          setUserProfile(null);
-          setUserPosts([]);
-          setUserReviews([]);
-          return ;
-        }
+         const { data } = await api.get(
+        `/api/v1/users/user/${encodeURIComponent(username)}`
+      );
 
-        setUserProfile(profile)
-        setUserPosts(mockPublicPosts)
+      // backend replies →  { success: true, data: {...user profile...} }
+      if (!data?.success || !data?.data) {
+        setError('User profile not found.');
+        setUserProfile(null);
+        setUserPosts([]);
+        setUserReviews([]);
+        return;
+      }
+        setUserProfile(data.data)
         setUserReviews(mockReviews)
 
         // Check if current user is following this user
@@ -61,8 +56,32 @@ const PublicProfile = () => {
       }
     }
 
+    const fetchuserPosts = async () => {
+      setIsLoading(true)
+      try {
+        const { data } = await api.get(`/api/v1/post/user-posts/${username}`);
+        
+        if(data?.success) {
+          setUserPosts(data.data);
+          toast.success("User posts fetched")
+        }
+        else{
+          toast.error(data?.message || "Failed to fetch posts")
+        }
+        
+      } catch (error) {
+        toast.error("error while fetching the posts"+error.message)
+      }
+      finally{
+        setIsLoading(false);
+      }
+    }
+
+  useEffect(() => {
     fetchUserProfile()
-  }, [userId,error])
+    fetchuserPosts()
+
+  }, [username,error])
 
   const handleStartChat = async () => {
     setActionLoading(true)
@@ -71,7 +90,7 @@ const PublicProfile = () => {
       await new Promise((resolve) => setTimeout(resolve, 500))
 
       // Navigate to chat with this user
-      navigate(`/chat/${userId}`)
+      navigate(`/chat/${username}`)
     } catch (error) {
       console.error("Error starting chat:", error)
     } finally {
@@ -174,17 +193,19 @@ const PublicProfile = () => {
           isLoading={actionLoading}
         />
 
-        {/* Profile Tabs */}
+       <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+         {/* Profile Tabs */}
         <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} userProfile={userProfile} isOwnProfile={false} />
 
         {/* Tab Content */}
-        <div className="bg-white rounded-b-3xl shadow-2xl p-6 md:p-8 border border-gray-100 border-t-0">
-          {activeTab === "posts" && <UserPosts posts={userPosts} isOwnProfile={false} />}
+        <div className="p-6 md:p-8">
+          {activeTab === "posts" &&  <UserPosts posts={userPosts} isOwnProfile={false} />}
 
           {activeTab === "about" && <UserAbout userProfile={userProfile} />}
 
           {activeTab === "reviews" && <UserReviews userProfile={userProfile} reviews={userReviews} />}
         </div>
+       </div>
       </div>
     </div>
   )

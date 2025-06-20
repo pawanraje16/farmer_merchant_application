@@ -35,8 +35,8 @@ const FeedPost = ({ post, onAuthorClick}) => {
     //  e.stopPropagation()
      navigate(`/post/${postId}`)
   }
-  const handleAuthorClick = (authorId) => {
-   navigate(`/user/${authorId}`)
+  const handleAuthorClick = (username) => {
+   navigate(`/user/${username}`)
   }
 
   const handleChatClick = (authorId) => {
@@ -47,7 +47,7 @@ const FeedPost = ({ post, onAuthorClick}) => {
     <div
       className="group bg-gradient-to-br from-red to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200 relative overflow-hidden cursor-pointer"
      
-    > <h1>pawanraje Ukarde</h1>
+    >
       {/* Featured Badge */}
       {post.isFeatured && (
         <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-10">
@@ -59,11 +59,11 @@ const FeedPost = ({ post, onAuthorClick}) => {
       <div className="flex items-center justify-between mb-6">
         <div
           className="flex items-center space-x-4 cursor-pointer hover:bg-gray-50 rounded-xl p-2 -m-2 transition-colors"
-          onClick={() => handleAuthorClick(post.author._id)}
+          onClick={() => handleAuthorClick(post?.author?.username)}
         >
           <div className="relative">
             <img
-              src={post.author.profilePhoto || "/placeholder.svg?height=50&width=50"}
+              src={post.author.avatar || "/placeholder.svg?height=50&width=50"}
               alt={post.author.fullName}
               className="w-12 h-12 rounded-full object-cover border-2 border-green-200"
             />

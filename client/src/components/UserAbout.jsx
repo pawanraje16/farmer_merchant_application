@@ -61,10 +61,10 @@ const UserAbout = ({ userProfile }) => {
         </h3>
         <div className="space-y-4">
           {[
-            { label: "State", value: userProfile?.location?.state, icon: "🗺️" },
-            { label: "District", value: userProfile?.location?.district, icon: "🏘️" },
-            { label: "City", value: userProfile?.location?.city, icon: "🏙️" },
-            { label: "Pincode", value: userProfile?.location?.pincode, icon: "📮" },
+            { label: "State", value: userProfile?.address?.state, icon: "🗺️" },
+            { label: "District", value: userProfile?.address?.district, icon: "🏘️" },
+            { label: "City", value: userProfile?.address?.city, icon: "🏙️" },
+            { label: "Pincode", value: userProfile?.address?.pincode, icon: "📮" },
           ].map((item, index) => (
             <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm">
               <span className="text-xl">{item.icon}</span>

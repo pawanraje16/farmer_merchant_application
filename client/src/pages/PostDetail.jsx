@@ -3,13 +3,15 @@ import { useParams, useNavigate } from "react-router-dom"
 import PostImage from "../components/PostImage"
 import LoadingSpinner from "../components/LoadingSpinner"
 import { useFeed } from "../context/FeedContext"
+import { usePost } from "../context/PostContext"
 
 const PostDetail = () => {
   const { postId } = useParams()  // Only extract postId once
   const { mockFeedPosts } = useFeed()
+  const {posts} = usePost()
 
   // Find the post by postId, not id
-  const selectedPost = mockFeedPosts.find(post => post._id === postId)
+  const selectedPost = posts.find(post => post._id === postId)
 
   const navigate = useNavigate()
   const [post, setPost] = useState(null)

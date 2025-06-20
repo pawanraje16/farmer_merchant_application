@@ -1,8 +1,10 @@
-"use client"
 
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useFeed } from "../context/FeedContext"
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+
 
 export default function Register() {
   const navigate = useNavigate()
@@ -24,7 +26,8 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [photoPreview, setPhotoPreview] = useState(null)
 
-  const { axios } = useFeed()
+
+  const {register,user} = useAuth()
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -140,77 +143,52 @@ export default function Register() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+  e.preventDefault();
 
-    if (!validateForm()) return
+  if (!validateForm()) return;
 
-    setIsLoading(true)
+  // show a spinner‑style toast right away
+  const toastId = toast.loading("Creating your account…");
+  setIsLoading(true);
 
-    try {
-      // Create FormData for multipart/form-data request
-      const formDataToSend = new FormData()
+  try {
+    /* ---------- build FormData exactly as before ---------- */
+    const formDataToSend = new FormData();
+    formDataToSend.append("fullName", formData.fullName);
+    formDataToSend.append("contact", formData.contact);
+    formDataToSend.append("username", formData.username);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("adharNo", formData.adharNo);
+    formDataToSend.append("userType", formData.userType);
+    formDataToSend.append("password", formData.password);
+    formDataToSend.append("confirmPassword", formData.confirmPassword);
+    if (formData.avatar) formDataToSend.append("avatar", formData.avatar);
 
-      // Append all form fields
-      formDataToSend.append("fullName", formData.fullName)
-      formDataToSend.append("contact", formData.contact)
-      formDataToSend.append("username", formData.username)
-      formDataToSend.append("email", formData.email)
-      formDataToSend.append("adharNo", formData.adharNo)
-      formDataToSend.append("userType", formData.userType)
-      formDataToSend.append("password", formData.password)
-      formDataToSend.append("confirmPassword", formData.confirmPassword)
+    // const { data } = await axios.post(
+    //   "/api/v1/users/register",
+    //   formDataToSend,
+    //   {
+    //     headers: { "Content-Type": "multipart/form-data" },
+    //     withCredentials: true,
+    //   }
+    // );
 
-      // Append avatar file if selected (user profile photo)
-      if (formData.avatar) {
-        formDataToSend.append("avatar", formData.avatar)
-      }
+    register(formDataToSend)
+    if(user){
+    navigate("/");}
+  } catch (error) {
+    /* ---------- failure ---------- */
+    const message =
+      error.response?.data?.message ??
+      (error.request
+        ? "Network error. Check your connection."
+        : "Unexpected error. Please try again.");
 
-      // Make API call to your backend using axios
-      const response = await axios.post("/api/v1/users/register", formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-
-      // Registration successful
-      console.log("Registration successful:", response.data)
-
-      // Store user data (you might want to store actual tokens from response)
-      if (response.data.data) {
-        localStorage.setItem("authToken", response.data.data.token || "temp-token")
-        localStorage.setItem("userType", formData.userType)
-        localStorage.setItem("username", formData.username)
-        localStorage.setItem("userId", response.data.data._id)
-      }
-
-      // Show success message (optional)
-      alert("Registration successful! Welcome to AgroConnect!")
-
-      // Redirect to home page or dashboard
-      navigate("/")
-    } catch (error) {
-      console.error("Registration error:", error)
-
-      if (error.response) {
-        // Server responded with error status
-        setErrors({
-          form: error.response.data?.message || "Registration failed. Please try again.",
-        })
-      } else if (error.request) {
-        // Request was made but no response received
-        setErrors({
-          form: "Network error. Please check your connection and try again.",
-        })
-      } else {
-        // Something else happened
-        setErrors({
-          form: "An unexpected error occurred. Please try again.",
-        })
-      }
-    } finally {
-      setIsLoading(false)
-    }
+    toast.error(message, { id: toastId });
+  } finally {
+    setIsLoading(false);
   }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
