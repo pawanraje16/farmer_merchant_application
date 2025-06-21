@@ -8,9 +8,7 @@ import banana3 from './banana3.jpg';
 import grape1 from './grape1.jpg';
 import grape2 from './grape2.jpg';
 import grape3 from './grape3.jpg';
-import ram from './ram.jpg';
-import ajay from './ajay.jpg';
-import pradip from './pradip.jpg';
+
 
 
 
@@ -20,7 +18,5 @@ export const fruits = {
     banana:[banana1,banana2,banana3],
 }
 export const proPhoto = {
-    ram,
-    ajay,
-    pradip
+  
 }
