@@ -246,7 +246,7 @@ const Profile = () => {
               {/* Left Side - Profile Photo & Info */}
               <div className="flex flex-col md:flex-row md:items-start space-y-6 md:space-y-0 md:space-x-8">
                 <div className="relative group">
-                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-white shadow-2xl overflow-hidden bg-gradient-to-br from-green-400 to-blue-500 p-1">
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white flex items-center justify-center">
                     <img
                       src={userProfile?.avatar || "https://images.app.goo.gl/DYXBxqjZX46cbpN4A"}
                       alt="Profile"
