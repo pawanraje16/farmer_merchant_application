@@ -13,19 +13,19 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is already authenticated
   useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await api.get("/api/v1/users/is-auth"); // ✅ use consistent path
-        if (data.success) {
-          setUser(data.user);
-          // setIsFarmer(data.user.userType === "farmer");
-        }
-      } catch (error) {
-        setUser(null);
-      } finally {
-        setLoadingAuth(false);
-      }
-    })();
+    // (async () => {
+    //   try {
+    //     const { data } = await api.get("/api/v1/users/is-auth"); // ✅ use consistent path
+    //     if (data.success) {
+    //       setUser(data.user);
+    //       // setIsFarmer(data.user.userType === "farmer");
+    //     }
+    //   } catch (error) {
+    //     setUser(null);
+    //   } finally {
+    //     setLoadingAuth(false);
+    //   }
+    // })();
   }, []);
 
   // Register

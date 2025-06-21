@@ -60,9 +60,9 @@ const Login = () => {
     try {
       
      const newUser =  await login(formData)
-      if(newUser)
+      if(newUser?.success)
       {navigate("/")}
-      else toast.error("user not found+jgyj");
+      else toast.error("user not found");
     } catch (error) {
       setErrors({
         form: "Invalid email or password. Please try again.",
