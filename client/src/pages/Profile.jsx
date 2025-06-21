@@ -184,7 +184,7 @@ const Profile = () => {
         {/* Enhanced Profile Header */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mb-8 border border-gray-100">
           {/* Cover Photo with Gradient Overlay */}
-          <div className="relative h-80 md:h-[28rem] lg:h-[32rem]">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white flex items-center justify-center">
           {userProfile?.coverImage ? (
               <img
                src={previewImage || userProfile?.coverImage}
