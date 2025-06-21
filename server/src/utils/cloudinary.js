@@ -19,7 +19,7 @@ export const uploadOnCloudinary = (buffer, mimetype, folder = "") =>
       {
         resource_type: "auto",
         folder,
-        format: "auto",
+        format: "jpg",
       },
       (err, result) => {
         if (err) return reject(err);
