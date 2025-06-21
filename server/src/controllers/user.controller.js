@@ -82,13 +82,18 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
   
-const avatarBuffer = req.files?.avatar?.[0]?.buffer;
-const mimetype = req.files?.avatar?.[0]?.mimetype;
+const file = req.file ?? req.files?.avatar?.[0];
 
-if(!avatarBuffer){
-   throw new ApiError(400, "Error uploading avatar");
+if (!file?.buffer) {
+  throw new ApiError(400, "Avatar file is required");
 }
- const avatar = await  uploadOnCloudinary(avatarBuffer, mimetype, "avatar");
+
+const avatar = await uploadOnCloudinary(file.buffer, file.mimetype, "avatars");
+
+if (!avatar?.secure_url) {
+  throw new ApiError(400, "Error uploading avatar");
+}
+
 
 
   // Create user
@@ -306,17 +311,18 @@ const updateAccountDetails = asyncHandler (async(req, res) => {
 })
 
 const updateUserAvatar = asyncHandler(async(req, res) => {
-   const avatarLocalPath = req.file?.path
+const file = req.file;
 
-   if(!avatarLocalPath) {
-      throw new ApiError(400, "Avatar file is missing")
-   }
+if (!file?.buffer) {
+  throw new ApiError(400, "Avatar file is missing");
+}
 
-   const avatar = await uploadOnCloudinary(avatarLocalPath)
+const avatar = await uploadOnCloudinary(file.buffer, file.mimetype, "avatars");
 
-   if(!avatar.url){
-      throw new ApiError(400, "Error while uploading on avatar")
-   }
+if (!avatar?.secure_url) {
+  throw new ApiError(400, "Error while uploading avatar");
+}
+
 
    const user = await User.findByIdAndUpdate(
       req.user?._id,
@@ -369,9 +375,11 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
 
 const updateUserCoverImage= asyncHandler (async (req, res) => {
 
-   const coverImageLocalPath = req.file?.path;
-   console.log(req.file?.path);
-   if(!coverImageLocalPath) throw new ApiError(400, "Cover image file is missing!");
+   const file = req.file;
+
+   if (!file?.buffer) {
+   throw new ApiError(400, "Cover image file is missing");
+   }
 
    const userId = req.user._id;
 
@@ -386,8 +394,11 @@ const updateUserCoverImage= asyncHandler (async (req, res) => {
    //    }
    // }
 
-   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-   if(!coverImage?.url) throw new ApiError(400, "Failed to upload cover image");
+   const coverImage = await uploadOnCloudinary(file.buffer, file.mimetype, "coverImages");
+
+   if (!coverImage?.secure_url) {
+   throw new ApiError(400, "Error uploading cover image");
+   }
 
    const updatedUser = await User.findByIdAndUpdate(
        userId,

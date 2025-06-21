@@ -49,18 +49,18 @@ const createPost = asyncHandler(async (req, res) => {
   }
 
   
-  const files = req.files?.images || req.files;   // array() vs fields()
+  const files = req.files?.images || req.files;  // array() vs fields()
   if (!files || files.length === 0) {
     throw new ApiError(400, "At least one image is required.");
-  }
+   }
 
   // upload images to cloudinary
   const uploadResults = await Promise.all(
-    files.map(f => uploadOnCloudinary(f.path))
+    files.map((f) => uploadOnCloudinary(f.buffer, f.mimetype, "posts"))
   );
   const imageUrls = uploadResults
-    .map(r => r?.url)
-    .filter(Boolean);
+   .map((r) => r?.secure_url)   // secure_url for stream uploads
+   .filter(Boolean);
 
   if (imageUrls.length === 0) {
     throw new ApiError(400, "Image upload failed.");
