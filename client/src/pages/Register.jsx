@@ -230,7 +230,7 @@ export default function Register() {
                   <input type="file" accept="image/*" onChange={handlePhotoChange} name="avatar" className="hidden" />
                 </label>
               </div>
-              <p className="mt-2 text-xs text-gray-500">Upload profile photo (optional)</p>
+              <p className="mt-2 text-xs text-gray-500">Upload profile photo (must required!)</p>
               {errors.avatar && <p className="mt-1 text-sm text-red-600">{errors.avatar}</p>}
             </div>
 
