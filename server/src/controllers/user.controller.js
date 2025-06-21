@@ -177,7 +177,7 @@ const logoutUser = asyncHandler (async(req, res) => {
       {
          $unset: {
             refreshToken: 1
-         }
+         },
       },
       {
          new: true
@@ -185,8 +185,9 @@ const logoutUser = asyncHandler (async(req, res) => {
    )
 
    const options = {
-      httpOnly: true,
-      secure: true
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",  
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
    }
 
    return res 
