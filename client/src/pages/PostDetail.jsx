@@ -37,7 +37,7 @@ const PostDetail = () => {
 
   const handleAuthorClick = () => {
     if (post?.author?._id) {
-      navigate(`/user/${post.author._id}`)
+      navigate(`/user/${post.author.username}`)
     }
   }
 
@@ -229,7 +229,7 @@ const PostDetail = () => {
             <h2 className="text-xl font-bold text-gray-900 mb-4">About the Seller</h2>
             <div className="flex items-start space-x-4">
               <img
-                src={post.author?.profilePhoto || "/placeholder.svg"}
+                src={post.author?.avatar || "/placeholder.svg"}
                 alt={post.author?.fullName || "Seller"}
                 className="w-16 h-16 rounded-full object-cover border-2 border-green-200"
               />

@@ -102,8 +102,9 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: true, // only sent over HTTPS in production
+    secure: process.env.NODE_ENV === "production", // only sent over HTTPS in production
     sameSite: "Lax",
+    maxAge:  7 * 24 * 60 * 60 *1000 // maxAge 7 days
   };
 
   // ✅ Return user + cookies
@@ -151,7 +152,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
    const options = {
       httpOnly: true, // bydefault anyone modify the cookie after httponly making true only server will able to modify the cookies
-      secure: true
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 7 * 24 * 60 * 60 *1000
    }
    console.log(loggedInUser)
    return res
