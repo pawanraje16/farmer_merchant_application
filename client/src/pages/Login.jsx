@@ -60,7 +60,7 @@ const Login = () => {
     try {
       
      const newUser =  await login(formData)
-      if(newUser?.success)
+      if(newUser)
       {navigate("/")}
       else toast.error("user not found");
     } catch (error) {

@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
       const {success, data}=responseData;
       if(success){
         handleAuthSuccess(data.user)
-        return data.user;
+        return success;
       }
       else {
         toast.error(data.message);
