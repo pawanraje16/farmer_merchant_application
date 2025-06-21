@@ -43,12 +43,14 @@ export default function Register() {
       })
     }
   }
+ 
+  const maxFileSize= 10 * 1024 * 1024;
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0]
     if (file) {
       // Validate file size (optional - add 5MB limit)
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size >maxFileSize) {
         setErrors({
           ...errors,
           avatar: "File size should be less than 5MB",
