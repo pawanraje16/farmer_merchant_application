@@ -189,7 +189,7 @@ const Profile = () => {
               <img
                src={previewImage || userProfile?.coverImage}
                alt="Cover"
-               className="max-w-full max-h-full object-contain object-center"
+               className="absolute inset-0 w-full h-full object-cover"
                />
             ) :(
               <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-green-500 to-blue-500"></div>
@@ -250,7 +250,7 @@ const Profile = () => {
                     <img
                       src={userProfile?.avatar || "https://images.app.goo.gl/DYXBxqjZX46cbpN4A"}
                       alt="Profile"
-                      className="w-full h-full object-cover rounded-2xl"
+                      className="max-w-full max-h-full object-contain object-center"
                     />
                   </div>
                   <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full p-3 shadow-lg">
