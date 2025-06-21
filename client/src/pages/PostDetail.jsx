@@ -10,30 +10,38 @@ const PostDetail = () => {
   const { mockFeedPosts } = useFeed()
   const {posts} = usePost()
 
-  // Find the post by postId, not id
-  const selectedPost = posts.find(post => post._id === postId)
+
 
   const navigate = useNavigate()
   const [post, setPost] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
-  useEffect(() => {
-    const loadPostDetails = async () => {
-      setIsLoading(true)
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setPost(selectedPost)
-      } catch (error) {
-        console.error("Error loading post details:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  const getPostById = async (postId) => {
 
-    loadPostDetails()
-  }, [postId, selectedPost])
+    const cached = posts.find((p) => p._id === postId);
+    if(cached) return cached;
+
+    const { data } = await api.get(`/api/v1/post/${postId}`);
+    return data.data;
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    (async () => {
+      setIsLoading(true) ;
+      try {
+        const data =  await getPostById(postId);
+        if(isMounted)setPost(data);
+      } catch(err){
+        console.error("Could not load post: ", err);
+      } finally {
+        if(isMounted)setIsLoading(false);
+      }
+    }) ();
+    
+  }, [postId])
 
   const handleAuthorClick = () => {
     if (post?.author?._id) {
