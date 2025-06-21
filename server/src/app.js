@@ -21,6 +21,8 @@ import userRouter from './routes/user.routes.js'
 import postRouter from "./routes/post.routes.js"
 import { addressRouter } from "./routes/address.route.js"
 
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // routes declaration
 app.use("/api/v1/users", userRouter)
 //http://localhost:4000/api/v1/users/register
