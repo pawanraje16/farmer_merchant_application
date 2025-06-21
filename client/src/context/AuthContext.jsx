@@ -46,15 +46,15 @@ export const AuthProvider = ({ children }) => {
   // Login
   const login = async (payload) => {
     try {
-      const { data: responseData } = await api.post("/api/v1/users/login",
+      const { data: res } = await api.post("/api/v1/users/login",
         {
         email: payload.email, 
         password: payload.password
       });
-      const {success, data}=responseData;
-      if(success){
-        handleAuthSuccess(data.user)
-        return success;
+      
+      if(res.success){
+        handleAuthSuccess(user);
+        return res.data.user;
       }
       else {
         toast.error(data.message);
