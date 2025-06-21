@@ -88,7 +88,7 @@ const mimetype = req.files?.avatar?.[0]?.mimetype;
 if(!avatarBuffer){
    throw new ApiError(400, "Error uploading avatar");
 }
-avatar = await  uploadOnCloudinary(avatarBuffer, mimetype, "avatar");
+ const avatar = await  uploadOnCloudinary(avatarBuffer, mimetype, "avatar");
 
 
   // Create user
