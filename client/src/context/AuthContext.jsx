@@ -70,11 +70,15 @@ export const AuthProvider = ({ children }) => {
   // Logout
   const logout = async () => {
     try {
-    const response  = await api.get("/api/v1/users/logout");
-    } finally {
+      const response  = await api.get("/api/v1/users/logout");
+      toast.success(response.message);
+    } catch(error){
+      toast.error("Logout failed");
+      console.error(error);
+    } 
+    finally {
       setUser(null);
       setIsFarmer(false);
-      toast.success(response);
     }
   };
 
