@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { useFeed } from "../context/FeedContext"
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
-
+import imageCompression from "browser-image-compression";
 
 export default function Register() {
   const navigate = useNavigate()
@@ -44,50 +44,75 @@ export default function Register() {
     }
   }
  
-  const maxFileSize= 10 * 1024 * 1024;
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      // Validate file size (optional - add 5MB limit)
-      if (file.size >maxFileSize) {
-        setErrors({
-          ...errors,
-          avatar: "File size should be less than 5MB",
-        })
-        return
-      }
 
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setErrors({
-          ...errors,
-          avatar: "Please select a valid image file",
-        })
-        return
-      }
+  const MAX_FILE_SIZE_MB = 10;
 
-      setFormData({
-        ...formData,
-        avatar: file,
-      })
+const handlePhotoChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-      // Clear any previous avatar errors
-      if (errors.avatar) {
-        setErrors({
-          ...errors,
-          avatar: "",
-        })
-      }
-
-      // Create preview
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result)
-      }
-      reader.readAsDataURL(file)
-    }
+  // Validate file type
+  if (!file.type.startsWith("image/")) {
+    setErrors({
+      ...errors,
+      avatar: "Please select a valid image file",
+    });
+    return;
   }
+
+  let finalFile = file;
+
+  try {
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      // Compress image only if size > 10MB
+      const options = {
+        maxSizeMB: 10, // Compress to under 10MB
+        maxWidthOrHeight: 1920, // Optional: resize large images
+        useWebWorker: true,
+      };
+
+      finalFile = await imageCompression(file, options);
+      console.log(`Compressed image size: ${(finalFile.size / 1024 / 1024).toFixed(2)} MB`);
+    }
+
+    // If still larger than 10MB after compression, reject it
+    if (finalFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setErrors({
+        ...errors,
+        avatar: "Compressed file is still too large. Please choose a smaller image.",
+      });
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      avatar: finalFile,
+    });
+
+    // Clear previous error
+    if (errors.avatar) {
+      setErrors({
+        ...errors,
+        avatar: "",
+      });
+    }
+
+    // Preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result);
+    };
+    reader.readAsDataURL(finalFile);
+
+  } catch (err) {
+    console.error("Image compression failed:", err);
+    setErrors({
+      ...errors,
+      avatar: "Failed to compress image. Try a different file.",
+    });
+  }
+};
 
   const validateForm = () => {
     const newErrors = {}
