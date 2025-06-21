@@ -73,8 +73,8 @@ export const AuthProvider = ({ children }) => {
       const response  = await api.get("/api/v1/users/logout");
       toast.success(response?.message);
     } catch(error){
-      toast.error("Logout failed");
-      console.error(error);
+      toast.error( error);
+      console.error(error.message);
     } 
     finally {
       setUser(null);
