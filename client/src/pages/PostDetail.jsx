@@ -247,7 +247,7 @@ const PostDetail = () => {
                   <span>•</span>
                   <span>{post.author?.userType || ""}</span>
                   <span>•</span>
-                  <span>Member since {post.author?.memberSince || ""}</span>
+                  <span>Member since {post.author?.createdAt || ""}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <div className="flex items-center text-yellow-500">
