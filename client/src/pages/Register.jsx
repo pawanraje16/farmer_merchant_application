@@ -46,11 +46,13 @@ export default function Register() {
  
 
 
-  const MAX_FILE_SIZE_MB = 10;
+
 
 const handlePhotoChange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
+  const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
   // Validate file type
   if (!file.type.startsWith("image/")) {
@@ -64,41 +66,42 @@ const handlePhotoChange = async (e) => {
   let finalFile = file;
 
   try {
-    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      // Compress image only if size > 10MB
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      // Only compress if larger than 10MB
       const options = {
-        maxSizeMB: 10, // Compress to under 10MB
-        maxWidthOrHeight: 1920, // Optional: resize large images
+        maxSizeMB: 10,
+        maxWidthOrHeight: 1920,
         useWebWorker: true,
       };
 
       finalFile = await imageCompression(file, options);
-      console.log(`Compressed image size: ${(finalFile.size / 1024 / 1024).toFixed(2)} MB`);
+
+      // ❗ Recheck after compression
+      if (finalFile.size > MAX_FILE_SIZE_BYTES) {
+        setErrors({
+          ...errors,
+          avatar: "Compressed image is still over 10MB. Please choose a smaller file.",
+        });
+        return;
+      }
+
+      console.log(
+        `Compressed from ${(file.size / 1024 / 1024).toFixed(2)}MB to ${(finalFile.size / 1024 / 1024).toFixed(2)}MB`
+      );
     }
 
-    // If still larger than 10MB after compression, reject it
-    if (finalFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      setErrors({
-        ...errors,
-        avatar: "Compressed file is still too large. Please choose a smaller image.",
-      });
-      return;
-    }
-
-    setFormData({
-      ...formData,
+    // Set final image (original or compressed)
+    setFormData((prev) => ({
+      ...prev,
       avatar: finalFile,
-    });
+    }));
 
     // Clear previous error
     if (errors.avatar) {
-      setErrors({
-        ...errors,
-        avatar: "",
-      });
+      setErrors((prev) => ({ ...prev, avatar: "" }));
     }
 
-    // Preview
+    // Preview image
     const reader = new FileReader();
     reader.onloadend = () => {
       setPhotoPreview(reader.result);
