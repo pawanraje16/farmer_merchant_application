@@ -4,6 +4,7 @@ import PostImage from "../components/PostImage"
 import LoadingSpinner from "../components/LoadingSpinner"
 import { useFeed } from "../context/FeedContext"
 import { usePost } from "../context/PostContext"
+import api from "../utils/api"
 
 const PostDetail = () => {
   const { postId } = useParams()  // Only extract postId once
