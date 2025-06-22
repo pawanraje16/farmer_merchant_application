@@ -28,7 +28,7 @@ const Crops = () => {
 
 
   const {filteredPosts, setFilteredPosts, isLoading, setIsLoading, filters, setFilters,mockFeedPosts}=useFeed();
-  const {posts} = usePost();
+  const {posts,fetchPosts} = usePost();
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -44,7 +44,7 @@ const Crops = () => {
         setIsLoading(false)
       }
     }
-
+    fetchPosts()
     loadPosts()
   }, [])
 

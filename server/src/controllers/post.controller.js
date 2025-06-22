@@ -105,7 +105,7 @@ const createPost = asyncHandler(async (req, res) => {
 
 const getPostById = asyncHandler ( async (req, res) => {
   const {postId} = req.params;
-
+  console.log(`fetching the post req having id : ${postId}`)
   if(!postId)
   {
     throw new ApiError(400, "Post ID is required");
