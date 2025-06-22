@@ -94,15 +94,7 @@ const Crops = () => {
     setFilters(newFilters)
   }
 
-  // const handlePostClick = (postId) => {
-  //   // Navigate to post detail view first
-  //   navigate(`/post/${postId}`)
-  // }
 
-  // const handleAuthorClick = (authorId) => {
-  //   // Navigate to author profile
-  //   navigate(`/user/${authorId}`)
-  // }
 
   // const handleChatClick = (authorId) => {
   //   // Navigate to chat with author
