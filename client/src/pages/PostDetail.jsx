@@ -68,13 +68,10 @@ const PostDetail = () => {
     return <LoadingSpinner message="Loading product details..." icon="🌾" />
   }
 
-  if (!post) {
-    return (
-      <div className="text-center text-red-500 py-10 text-lg">
-        Post not found: {postId}
-      </div>
-    )
-  }
+if (!post) {
+  return <LoadingSpinner message="Fetching post..." icon="🌾" />
+}
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
