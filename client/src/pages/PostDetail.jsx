@@ -19,8 +19,8 @@ const PostDetail = () => {
 
   const getPostById = async (postId) => {
 
-    const cached = posts.find((p) => p._id === postId);
-    if(cached) return cached;
+    // const cached = posts.find((p) => p._id === postId);
+    // if(cached) return cached;
 
     const { data } = await api.get(`/api/v1/post/${postId}`);
     return data.data;
@@ -88,7 +88,7 @@ const PostDetail = () => {
           <span>Back to results</span>
         </button>
 
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+      {post && ( <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
           {/* Product Gallery and Info */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
             {/* Image Gallery */}
@@ -281,7 +281,7 @@ const PostDetail = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>)}
       </div>
     </div>
   )
