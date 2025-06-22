@@ -126,7 +126,7 @@ const getPostById = asyncHandler ( async (req, res) => {
 const getAllPosts = asyncHandler (async (req, res) => {
   const posts = await Post.find({})
   .sort({ createdAt: -1})
-  .populate("author", "fullName avatar username")
+  .populate("author", "fullName avatar username createdAt")
   .lean();
   console.log(posts)
   res.status(200)
