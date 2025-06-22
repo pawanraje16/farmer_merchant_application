@@ -35,19 +35,21 @@ const Crops = () => {
       setIsLoading(true)
       try {
         // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setFilteredPosts(posts)
+        await fetchPosts()
       } catch (error) {
         console.error("Error loading posts:", error)
       } finally {
         setIsLoading(false)
       }
     }
-    fetchPosts()
+    
     loadPosts()
   }, [])
 
    useEffect(() => {
+    
+    if(!posts ||  posts?.length === 0) return ;
+    setIsLoading(true)
     // Apply filters
     const filtered = posts.filter((post) => {
       // Category filter
@@ -87,6 +89,7 @@ const Crops = () => {
     });
 
     setFilteredPosts(filtered);
+    setIsLoading(false);
   }, [filters, posts]);
 
 
