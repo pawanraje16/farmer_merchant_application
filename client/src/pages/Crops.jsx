@@ -121,7 +121,7 @@ const Crops = () => {
           title="Crops & Produce"
           subtitle="Find exactly what you're looking for by crop type and location"
           icon="🌾"
-          stats={[`${Array.isArray(filteredPosts) ? filteredPosts.length : 0} Posts Found`]}
+          stats={[`${filteredPosts?.length ?? 0} Posts Found`]}
         />
 
         {/* Filters */}
