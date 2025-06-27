@@ -142,7 +142,6 @@ if (!avatar?.secure_url) {
     );
 });
 
-
 const loginUser = asyncHandler(async (req, res) => {
    const {email, password} = req.body
    console.log(req.body);
@@ -282,10 +281,10 @@ const changeCurrentPassword = asyncHandler(async(req, res) => {
 
 const getCurrentUser = asyncHandler(async(req, res) => {
 
-   console.log(req.user)
+   console.log("current-user", req.user)
    return res
    .status(200)
-   .json(new ApiResponse(200, req.user, "current user fetched successfully"))
+   .json(new ApiResponse(200, {user: req.user}, "current user fetched successfully"))
 })
 
 const updateAccountDetails = asyncHandler (async(req, res) => {

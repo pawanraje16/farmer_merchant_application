@@ -20,26 +20,28 @@ import CreatePost from './pages/CreatePost.jsx'
 import { FeedProvider } from './context/FeedContext.jsx'
 import {Toaster, toast} from "react-hot-toast"
 import { AppProvider } from './context/AppProvider.jsx'
+import ProtectedRoute from './routes/protected-route.jsx'
+import PublicRoute from './routes/PublicRoute.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
        <>
       
       {/* Auth Routes - No Layout/Navbar */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
       {/* Main App Routes with Layout/Navbar */}
       <Route path="/" element={<Layout />}>
-        <Route path="" element={<Home />} />
-        <Route path="crops" element={<Crops />} />
-        <Route path="market" element={<Market />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="user/:username" element={<PublicProfile />} />
-        <Route path="chat" element={<Chat />} />
-        <Route path="chat/:userId" element={<Chat />} />
-        <Route path="post/:postId" element={<PostDetail/>}/>
-        <Route path="create-post" element={<CreatePost/>}/>
+        <Route path="" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="crops" element={<ProtectedRoute><Crops /></ProtectedRoute>} />
+        <Route path="market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
+        <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="user/:username" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
+        <Route path="chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+        <Route path="chat/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+        <Route path="post/:postId" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
+        <Route path="create-post" element={<ProtectedRoute><CreatePost/></ProtectedRoute>}/>
       </Route>
     </>,
   ),

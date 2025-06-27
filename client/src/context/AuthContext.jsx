@@ -7,25 +7,27 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
   const [isFarmer, setIsFarmer] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
   // Check if user is already authenticated
   useEffect(() => {
-    // (async () => {
-    //   try {
-    //     const { data } = await api.get("/api/v1/users/is-auth"); // ✅ use consistent path
-    //     if (data.success) {
-    //       setUser(data.user);
-    //       // setIsFarmer(data.user.userType === "farmer");
-    //     }
-    //   } catch (error) {
-    //     setUser(null);
-    //   } finally {
-    //     setLoadingAuth(false);
-    //   }
-    // })();
+    (async () => {
+      try {
+        const { data } = await api.get("/api/v1/users/current-user"); // ✅ use consistent path
+        if (data.success) {
+          setUser(data.data.user);
+          console.log(data.user)
+          toast.success(`user is authenticated`)
+          
+        }
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoadingAuth(false);
+      }
+    })();
   }, []);
 
   // Register
@@ -53,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       });
       
       if(res.success){
-        handleAuthSuccess(user);
+        handleAuthSuccess(res.data.user);
         return res.data.user;
       }
       else {
