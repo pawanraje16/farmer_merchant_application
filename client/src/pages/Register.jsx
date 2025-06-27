@@ -203,7 +203,7 @@ const handlePhotoChange = async (e) => {
     //   }
     // );
 
-    register(formDataToSend)
+    const success= register(formDataToSend)
     if(user){
     navigate("/");}
   } catch (error) {

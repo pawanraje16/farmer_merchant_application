@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser"
 const app = express()
 
 app.use(cors({
-    origin: ["https://farmermerchantconnection.vercel.app"],
+    origin: ["https://farmermerchantconnection.vercel.app", "http://localhost:5173"],
     credentials: true
 }))
 
@@ -20,6 +20,7 @@ app.use(cookieParser())
 import userRouter from './routes/user.routes.js'
 import postRouter from "./routes/post.routes.js"
 import { addressRouter } from "./routes/address.route.js"
+import { errorHandler } from "./middlewares/errorHandler.js"
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
@@ -32,5 +33,7 @@ app.use("/api/v1/post", postRouter)
 
 // address Routes
 app.use("/api/v1/address",addressRouter)
+
+app.use(errorHandler)
 
 export { app }

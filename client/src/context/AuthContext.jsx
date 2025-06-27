@@ -32,16 +32,22 @@ export const AuthProvider = ({ children }) => {
 
   // Register
   const register = async (payload) => {
+   
     try {
-      const { data } = await api.post("/api/v1/users/register", payload, {
+      const  { data } = await api.post("/api/v1/users/register", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       data.success
-        ? handleAuthSuccess(data.user)
+        ? handleAuthSuccess(data.data.user)
         : toast.error(data.message);
-    } catch (err) {
-      toast.error(err.message);
+      return data.success
+    } catch (error) {
+      const message =
+      error?.response?.data?.message || // ✅ From ApiError
+      error?.message ||                 // Fallback
+      "Something went wrong";
+       toast.error(message); // Show exact server error
     }
   };
 
