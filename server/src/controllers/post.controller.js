@@ -112,7 +112,7 @@ const getPostById = asyncHandler ( async (req, res) => {
   }
 
   const post = await Post.findById(postId)
-  .populate("author","username fullname avatar")
+  .populate("author","username fullname avatar createdAt")
   .lean()
 
   if(!post) {

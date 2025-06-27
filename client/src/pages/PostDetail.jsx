@@ -5,6 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner"
 import { useFeed } from "../context/FeedContext"
 import { usePost } from "../context/PostContext"
 import api from "../utils/api"
+import { formatDistanceToNow } from 'date-fns'
 
 const PostDetail = () => {
   const { postId } = useParams()  // Only extract postId once
@@ -253,7 +254,7 @@ if (!post) {
                   <span>•</span>
                   <span>{post.author?.userType || ""}</span>
                   <span>•</span>
-                  <span>Member since {post.author?.createdAt || ""}</span>
+                  <span>Member since {formatDistanceToNow(new Date(post.author?.createdAt), { addSuffix: true }) || ""}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <div className="flex items-center text-yellow-500">
