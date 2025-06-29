@@ -180,7 +180,34 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 const getLoggedInUserPosts = asyncHandler (async(req, res)=> {
   const userId = req.user?._id;
-  const posts = await Post.find({ author: userId}).sort({createdAt: -1});
+  // const posts = await Post.find({ author: userId}).sort({createdAt: -1});
+  const posts = await Post.aggregate([
+    {
+      $match: { author: userId }
+    },
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $lookup: {
+        from: "likes",           // Match collection name used for Like model
+        localField: "_id",
+        foreignField: "post",
+        as: "likes"
+      }
+    },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" }
+      }
+    },
+    {
+      $project: {
+         likes: 0,
+         "authorDetails": 0,
+      }
+    }
+  ]);
   console.log(posts);
   res
   .status(200)

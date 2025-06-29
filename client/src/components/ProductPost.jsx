@@ -105,7 +105,7 @@ const ProductPost = ({ post }) => {
             <div className="flex items-center space-x-6 text-sm text-gray-500">
               <span className="flex items-center space-x-1 hover:text-red-500 cursor-pointer transition-colors">
                 <span>❤️</span>
-                <span>{post.likes}</span>
+                <span>{post.likesCount}</span>
               </span>
               <span className="flex items-center space-x-1 hover:text-blue-500 cursor-pointer transition-colors">
                 <span>💬</span>

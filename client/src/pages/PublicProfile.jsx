@@ -64,7 +64,6 @@ const PublicProfile = () => {
         
         if(data?.success) {
           setUserPosts(data.data);
-          toast.success("User posts fetched")
         }
         else{
           toast.error(data?.message || "Failed to fetch posts")

@@ -15,7 +15,6 @@ export const PostProvider = ({ children }) => {
       const  response  = await api.get("/api/v1/post/feed");
       const postArray = response.data.data;
       setPosts(postArray);
-      toast.success("fetched posts successfully")
     } catch (err) {
       toast.error(err.meassage +"Couldn't fetch posts");
     } finally {

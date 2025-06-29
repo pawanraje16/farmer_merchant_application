@@ -30,9 +30,9 @@ const Profile = () => {
         const response = await api.get("/api/v1/users/profile")
         const {data} =response
         console.log(data);
-        if(data?.success)toast.success("userfetched")
-        console.log(data.data)
-        setUserProfile(data.data)
+        if(data?.success){
+          setUserProfile(data.data)}
+       
         // setUserPosts(mockUserPosts)
         setEditForm(mockUserProfile)
       } catch (error) {
@@ -47,8 +47,8 @@ const Profile = () => {
       try {
         const response = await api.get("/api/v1/post/current-posts");
         const {data} = response;
-        if(data?.success)toast.success("posts fetched")
-        setUserPosts(data.data)
+        if(data?.success){
+        setUserPosts(data.data)}
         
       } catch (error) {
         console.error("Error fetching the profile posts", error)

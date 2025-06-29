@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
         if (data.success) {
           setUser(data.data.user);
           console.log(data.user)
-          toast.success(`user is authenticated`)
+          
           
         }
       } catch (error) {
