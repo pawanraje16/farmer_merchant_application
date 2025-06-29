@@ -88,7 +88,7 @@ const PublicProfile = () => {
     fetchuserPosts()
     // we have to update the isFollowing or not call api are you following or not
 
-  }, [username,error])
+  }, [username,isFollowing,error])
 
   const handleStartChat = async () => {
     setActionLoading(true)
@@ -115,13 +115,11 @@ const PublicProfile = () => {
       setIsFollowing(true);
 
       // Update UI follower count
-      setUserProfile((prev) => ({
+       setUserProfile((prev) => ({
         ...prev,
-        socialStats: {
-          ...prev.socialStats,
-          followers: prev.socialStats.followers + 1,
-        },
+        followersCount: (prev?.followersCount || 0) + 1,
       }));
+      
     } else {
       toast.error(data?.message || "Failed to follow user.");
     }
@@ -138,17 +136,16 @@ const PublicProfile = () => {
     setActionLoading(true)
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
+     
+      const { data } = await api.delete(`/api/v1/follow/unfollow/${username}`);
+      if(data.success)
       setIsFollowing(false)
 
       // Update follower count
-      setUserProfile((prev) => ({
+     setUserProfile((prev) => ({
         ...prev,
-        socialStats: {
-          ...prev.socialStats,
-          followers: prev.socialStats.followers - 1,
-        },
-      }))
+        followersCount: Math.max(0, (prev?.followersCount || 1) - 1),
+      }));
     } catch (error) {
       console.error("Error unfollowing user:", error)
     } finally {

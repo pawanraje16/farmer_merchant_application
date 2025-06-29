@@ -38,13 +38,39 @@ const followUser = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, `Now following ${toFollowUsername}`));
 });
 
+const unfollowUser = asyncHandler(async (req, res) => {
+    const currentUserId = req.user?._id
+    const { username: toUnfollowUsername} = req.params;
 
-const unfollowUser = asyncHandler(async() => {
-    const currentUser = req.user?._id;
-    const toUnfollowusername = req.params;
+    const toUnfollowUser = await User.findOne({ username: toUnfollowUsername });
+
+    if(!toUnfollowUser) {
+        throw new ApiError(404, "User not found");
+    }
+
+    if(toUnfollowUser._id.equals(currentUserId)) {
+        throw new ApiError(400, "You cannot unfollow yourself");
+    }
+
+    const followRecord = await Follow.findOneAndDelete({
+        follower: currentUserId,
+        following: toUnfollowUser._id,
+    });
+
+    if(!followRecord){
+        throw new ApiError(400, "You are not following this user");
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, null, `Unfollowed ${toUnfollowUsername}`));
 })
 
 
+
+
+
 export{
-    followUser
-}
+    followUser,
+    unfollowUser
+};
