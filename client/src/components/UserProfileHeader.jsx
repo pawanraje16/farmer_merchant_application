@@ -169,13 +169,13 @@ const UserProfileHeader = ({
               </div>
               <div className="text-center group cursor-pointer">
                 <div className="bg-gradient-to-br from-green-500 to-teal-600 text-white rounded-2xl p-4 shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
-                  <div className="text-2xl font-bold">{userProfile?.socialStats?.followers}</div>
+                  <div className="text-2xl font-bold">{userProfile?.followersCount}</div>
                   <div className="text-sm opacity-90">Followers</div>
                 </div>
               </div>
               <div className="text-center group cursor-pointer">
                 <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl p-4 shadow-lg group-hover:shadow-xl transition-all group-hover:scale-105">
-                  <div className="text-2xl font-bold">{userProfile?.socialStats?.following}</div>
+                  <div className="text-2xl font-bold">{userProfile?.followingCount}</div>
                   <div className="text-sm opacity-90">Following</div>
                 </div>
               </div>

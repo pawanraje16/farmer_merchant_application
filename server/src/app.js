@@ -20,6 +20,7 @@ app.use(cookieParser())
 import userRouter from './routes/user.routes.js'
 import postRouter from "./routes/post.routes.js"
 import { addressRouter } from "./routes/address.route.js"
+import followRouter from "./routes/follow.route.js"
 import { errorHandler } from "./middlewares/errorHandler.js"
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
@@ -33,6 +34,9 @@ app.use("/api/v1/post", postRouter)
 
 // address Routes
 app.use("/api/v1/address",addressRouter)
+
+// follow Routes
+app.use("/api/v1/follow",followRouter)
 
 app.use(errorHandler)
 

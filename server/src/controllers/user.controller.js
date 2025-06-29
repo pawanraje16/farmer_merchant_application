@@ -483,14 +483,48 @@ const getUserByUsername = asyncHandler (async(req, res) => {
          },
       },
       {
+         $lookup: {
+            from: "follows",
+            localField: "_id",
+            foreignField: "following",
+            as : "followers"
+         }
+      },
+      {
+         $lookup: {
+            from: "follows",
+            localField: "_id",
+            foreignField: "follower",
+            as : "followingTo"
+         }
+      },
+      {
          $addFields: {
             address: { $arrayElemAt: ["$address", 0] },
-         },
+            followersCount: { $size: "$followers" },
+            followingCount: { $size: "$followingTo" },
+            isFollowing: {
+               $in: [
+               req.user?._id,
+               {
+                  $map: {
+                     input: "$followers",
+                     as: "f",
+                     in: "$$f.follower"
+                  }
+               }
+               ]
+            }
+         }
       },
+
       {
          $project: {
             password: 0,
             refreshToken: 0,
+            followers: 0,
+            followingTo: 0,
+
          }
       },
    ])

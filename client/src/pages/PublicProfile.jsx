@@ -44,11 +44,12 @@ const PublicProfile = () => {
         return;
       }
         setUserProfile(data.data)
+        setIsFollowing(data?.data?.isFollowing)
         setUserReviews(mockReviews)
 
         // Check if current user is following this user
         // This would come from your backend
-        setIsFollowing(false)
+      
       } catch (error) {
         console.error("Error fetching profile:", error)
       } finally {
@@ -77,9 +78,15 @@ const PublicProfile = () => {
       }
     }
 
+    const isFollow = async () => {
+      // call api get status of the follow or not and set in the state
+      // setIsFollowing= api.get('api/v1/follow/username')
+    }
+
   useEffect(() => {
     fetchUserProfile()
     fetchuserPosts()
+    // we have to update the isFollowing or not call api are you following or not
 
   }, [username,error])
 
@@ -99,26 +106,33 @@ const PublicProfile = () => {
   }
 
   const handleFollow = async () => {
-    setActionLoading(true)
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      setIsFollowing(true)
+  setActionLoading(true);
+  try {
+    const { data } = await api.post(`/api/v1/follow/follow/${username}`);
 
-      // Update follower count
+    if (data?.success) {
+      toast.success("You are now following this user!");
+      setIsFollowing(true);
+
+      // Update UI follower count
       setUserProfile((prev) => ({
         ...prev,
         socialStats: {
           ...prev.socialStats,
           followers: prev.socialStats.followers + 1,
         },
-      }))
-    } catch (error) {
-      console.error("Error following user:", error)
-    } finally {
-      setActionLoading(false)
+      }));
+    } else {
+      toast.error(data?.message || "Failed to follow user.");
     }
+  } catch (error) {
+    console.error("Error following user:", error);
+    toast.error("Something went wrong while following.");
+  } finally {
+    setActionLoading(false);
   }
+};
+
 
   const handleUnfollow = async () => {
     setActionLoading(true)
