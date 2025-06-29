@@ -37,7 +37,7 @@ const FeedPost = ({ post, onAuthorClick}) => {
     setLikesCount((prev) => isLiked ? prev - 1 : prev + 1);
     
     await toggleLike(post._id, !isLiked); // like/unlike call
-    toast.success("click like")
+   
   } catch (err) {
     console.error("Like toggle failed", err);
     // Revert UI in case of error
