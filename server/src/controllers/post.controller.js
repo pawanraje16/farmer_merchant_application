@@ -123,14 +123,59 @@ const getPostById = asyncHandler ( async (req, res) => {
 })
 
 
-const getAllPosts = asyncHandler (async (req, res) => {
-  const posts = await Post.find({})
-  .sort({ createdAt: -1})
-  .populate("author", "fullName avatar username createdAt")
-  .lean();
+const getAllPosts = asyncHandler(async (req, res) => {
+  const currentUserId = req.user?._id;
+
+  const posts = await Post.aggregate([
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "author"
+      }
+    },
+    {
+      $unwind: "$author"
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "post",
+        as: "likes"
+      }
+    },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+        isLiked: {
+          $in: [
+            currentUserId,
+            {
+              $map: {
+                input: "$likes",
+                as: "like",
+                in: "$$like.likedBy"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        "likes": 0,
+        "author.password": 0,
+        "author.refreshToken": 0
+      }
+    }
+  ]);
   console.log(posts)
-  res.status(200)
-  .json(new ApiResponse (200, posts, "All posts fetched"));
+  res.status(200).json(new ApiResponse(200, posts, "All posts fetched"));
 });
 
 const getLoggedInUserPosts = asyncHandler (async(req, res)=> {

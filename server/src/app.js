@@ -22,6 +22,7 @@ import postRouter from "./routes/post.routes.js"
 import { addressRouter } from "./routes/address.route.js"
 import followRouter from "./routes/follow.route.js"
 import { errorHandler } from "./middlewares/errorHandler.js"
+import likeRouter from "./routes/like.route.js"
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
@@ -37,6 +38,9 @@ app.use("/api/v1/address",addressRouter)
 
 // follow Routes
 app.use("/api/v1/follow",followRouter)
+
+// like Routes
+app.use("/api/v1/like", likeRouter);
 
 app.use(errorHandler)
 

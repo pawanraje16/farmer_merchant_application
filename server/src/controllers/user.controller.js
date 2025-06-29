@@ -439,15 +439,46 @@ const getLoggedInUseProfile = asyncHandler(async (req, res) => {
          },
       },
       {
+         $lookup: {
+            from: "follows",
+            localField: "_id",
+            foreignField: "following",
+            as : "followers"
+         }
+      },
+      {
+         $lookup: {
+            from: "follows",
+            localField: "_id",
+            foreignField: "follower",
+            as : "followingTo"
+         }
+      },
+      {
+         $lookup: {
+            from: "posts",
+            localField: "_id",
+            foreignField: "author",
+            as: "Posts"
+
+         }
+      },
+      {
          $addFields: {
             address: { $arrayElemAt: ["$address", 0] },
+            followersCount: { $size: "$followers" },
+            followingCount: { $size: "$followingTo" },
+            totalPosts: { $size: "$Posts" },
          },
       },
       {
          $project: {
             password: 0,
             refreshToken : 0,
+            followers: 0,
+            followingTo: 0,
             _id: 0,
+            Posts: 0,
          }
       }
     ])
@@ -499,10 +530,20 @@ const getUserByUsername = asyncHandler (async(req, res) => {
          }
       },
       {
+         $lookup: {
+            from: "posts",
+            localField: "_id",
+            foreignField: "author",
+            as: "Posts"
+
+         }
+      },
+      {
          $addFields: {
             address: { $arrayElemAt: ["$address", 0] },
             followersCount: { $size: "$followers" },
             followingCount: { $size: "$followingTo" },
+            totalPosts: { $size: "$Posts" },
             isFollowing: {
                $in: [
                req.user?._id,
@@ -524,6 +565,7 @@ const getUserByUsername = asyncHandler (async(req, res) => {
             refreshToken: 0,
             followers: 0,
             followingTo: 0,
+            Posts: 0,
 
          }
       },

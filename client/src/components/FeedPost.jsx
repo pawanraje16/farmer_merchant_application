@@ -4,12 +4,16 @@ import { useState } from "react"
 import PostImage from "./PostImage"
 import { useFeed } from "../context/FeedContext"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
+import { toggleLike } from "../utils/like"
+import toast from "react-hot-toast"
 
 const FeedPost = ({ post, onAuthorClick}) => {
 
   const navigate=useNavigate();
-  const [isLiked, setIsLiked] = useState(false)
-  const [likesCount, setLikesCount] = useState(post.likes)
+  const [isLiked, setIsLiked] = useState(post.isLiked)
+  const [likesCount, setLikesCount] = useState(post.likesCount)
+  const {user} = useAuth();
 
   const getTimeAgo = (dateString) => {
     const now = new Date()
@@ -26,17 +30,32 @@ const FeedPost = ({ post, onAuthorClick}) => {
     })
   }
 
-  const handleLike = (e) => {
-    e.stopPropagation()
-    setIsLiked(!isLiked)
-    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
+  const handleLike = async (e) => {
+  e.stopPropagation();
+  try {
+    setIsLiked((prev) => !prev);
+    setLikesCount((prev) => isLiked ? prev - 1 : prev + 1);
+    
+    await toggleLike(post._id, !isLiked); // like/unlike call
+    toast.success("click like")
+  } catch (err) {
+    console.error("Like toggle failed", err);
+    // Revert UI in case of error
+    setIsLiked((prev) => !prev);
+    setLikesCount((prev) => isLiked ? prev + 1 : prev - 1);
   }
+}
+
   const handlePostClick = (postId) =>{
     //  e.stopPropagation()
      navigate(`/post/${postId}`)
   }
   const handleAuthorClick = (username) => {
-   navigate(`/user/${username}`)
+    if(username===user.username){
+      navigate(`/profile`)
+    }
+    else {
+   navigate(`/user/${username}`)}
   }
 
   const handleChatClick = (authorId) => {
@@ -51,7 +70,7 @@ const FeedPost = ({ post, onAuthorClick}) => {
       {/* Featured Badge */}
       {post.isFeatured && (
         <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-10">
-          ⭐ Featured
+          ⭐ Featured 
         </div>
       )}
 
