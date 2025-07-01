@@ -198,7 +198,19 @@ const getLoggedInUserPosts = asyncHandler (async(req, res)=> {
     },
     {
       $addFields: {
-        likesCount: { $size: "$likes" }
+        likesCount: { $size: "$likes" },
+        isLiked: {
+          $in: [
+            userId,
+            {
+              $map: {
+                input: "$likes",
+                as: "like",
+                in: "$$like.likedBy"
+              }
+            }
+          ]
+        }
       }
     },
     {
@@ -214,19 +226,59 @@ const getLoggedInUserPosts = asyncHandler (async(req, res)=> {
   .json(new ApiResponse(200, posts, "User posts Fetched"))
 })
 
-const getUserPosts = asyncHandler (async (req, res) => {
-       const{ username} = req.params;
-       const user = await User.findOne({username}).select("_id").lean();
+const getUserPosts = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  const  currentUserId = req.user?._id;
 
-       if (!user) {
-        throw new ApiError(404, "User Not found while fetching the uesr posts");
-       }
-       const posts = await Post.find({ author: user._id}).sort({createdAt: -1});
-       console.log(posts);
-       res
-       .status(200)
-       .json(new ApiResponse(200, posts, "User posts Fetched"))
-})
+  const user = await User.findOne({ username }).select("_id").lean();
+
+  if (!user) {
+    throw new ApiError(404, "User not found while fetching the user posts");
+  }
+
+  const posts = await Post.aggregate([
+    {
+      $match: { author: user._id }
+    },
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "post",
+        as: "likes"
+      }
+    },
+     {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+        isLiked: {
+          $in: [
+            currentUserId,
+            {
+              $map: {
+                input: "$likes",
+                as: "like",
+                in: "$$like.likedBy"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        likes: 0,
+        authorDetails: 0,
+      }
+    }
+  ]);
+
+  res.status(200).json(new ApiResponse(200, posts, "User posts fetched"));
+});
+
 
 export {
   createPost,

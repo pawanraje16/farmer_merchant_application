@@ -1,7 +1,30 @@
 import { useNavigate } from "react-router-dom"
 import PostImage from "./PostImage"
+import { useState } from "react"
+import { toggleLike } from "../utils/like"
+
 
 const ProductPost = ({ post }) => {
+     const [isLiked, setIsLiked] = useState(post.isLiked)
+       const [likesCount, setLikesCount] = useState(post.likesCount)
+
+
+    const handleLike = async (e) => {
+    e.stopPropagation();
+    try {
+      setIsLiked((prev) => !prev);
+      setLikesCount((prev) => isLiked ? prev - 1 : prev + 1);
+      
+      await toggleLike(post._id, !isLiked); // like/unlike call
+     
+    } catch (err) {
+      console.error("Like toggle failed", err);
+      // Revert UI in case of error
+      setIsLiked((prev) => !prev);
+      setLikesCount((prev) => isLiked ? prev + 1 : prev - 1);
+    }
+  }
+
   const getTimeAgo = (dateString) => {
     const now = new Date()
     const postDate = new Date(dateString)
@@ -103,10 +126,15 @@ const ProductPost = ({ post }) => {
               </span>
             </div>
             <div className="flex items-center space-x-6 text-sm text-gray-500">
-              <span className="flex items-center space-x-1 hover:text-red-500 cursor-pointer transition-colors">
-                <span>❤️</span>
-                <span>{post.likesCount}</span>
-              </span>
+              <button
+                onClick={handleLike}
+                className={`flex items-center space-x-1 transition-colors ${
+                  isLiked ? "text-red-500" : "hover:text-red-500"
+                }`}
+              >
+                <span>{isLiked ? "❤️" : "🤍"}</span>
+                <span>{likesCount}</span>
+              </button>
               <span className="flex items-center space-x-1 hover:text-blue-500 cursor-pointer transition-colors">
                 <span>💬</span>
                 <span>{post.comments}</span>
