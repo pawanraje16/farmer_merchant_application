@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState } from "react"
 
@@ -30,7 +30,7 @@ const PostFilters = ({ filters, onFilterChange, showCropSpecificFilters = false 
   const getDistrictsForState = (state) => {
     const districtMap = {
       Punjab: ["Ludhiana", "Amritsar", "Jalandhar", "Patiala"],
-      Maharashtra: ["Pune", "Nashik", "Ratnagiri", "Aurangabad"],
+      Maharashtra: ["Pune", "Nashik", "Ratnagiri", "Chhatrapati Sambhajinagar"],
       Haryana: ["Karnal", "Sirsa", "Hisar", "Panipat"],
       Karnataka: ["Bangalore Rural", "Belgaum", "Mysore", "Hubli"],
       "Tamil Nadu": ["Coimbatore", "Salem", "Madurai", "Thanjavur"],
