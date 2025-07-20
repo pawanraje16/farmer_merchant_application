@@ -16,7 +16,7 @@ const ChatInterface = () => {
   const [chatUser, setChatUser] = useState({})
   const [isTyping, setIsTyping] = useState(false)
 
-   const { messages, selectedUser, setSelectedUser, sendMessage, getMessages, users } = useChat();
+   const { messages, selectedUser, setSelectedUser, sendMessage, getMessages, users, getUsers } = useChat();
    const {user} = useAuth()
    
   // Mock chat user data
@@ -83,7 +83,7 @@ const ChatInterface = () => {
 useEffect(() => {
   const loadChatData = async () => {
     let targetUser = selectedUser;
-
+    if(!users) await getUsers();
     // If selectedUser is not set (like on refresh), find user by username in URL
     if (!selectedUser && userId && users.length > 0) {
       targetUser = users.find(u => u.username === userId);

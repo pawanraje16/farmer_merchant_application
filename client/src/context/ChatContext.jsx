@@ -82,6 +82,31 @@ export const ChatProvider = ({ children }) => {
         return () => unsubscribeFromMessages();
     },[socket, selectedUser])
 
+    useEffect(() => {
+        const cachedUsers = localStorage.getItem("chat_users");
+        const cachedUnseen = localStorage.getItem("chat_unseen");
+
+        if(cachedUsers){
+            setUsers(JSON.parse(cachedUsers));
+        }
+
+        if(cachedUnseen){
+            setUnseenMessages(JSON.parse(cachedUnseen));
+        }
+       
+        // Always refresh from server
+        getUsers();
+    }, []);
+
+     //  Whenever users/unseenMessages updates, cache them
+    useEffect(() => {
+        localStorage.setItem("chat_users", JSON.stringify(users));
+    }, [users]);
+
+    useEffect(() => {
+        localStorage.setItem("chat_unseen", JSON.stringify(unseenMessages));
+    }, [unseenMessages]);
+
     const value = {
         messages, users, selectedUser, getUsers, getMessages, sendMessage, setSelectedUser, unseenMessages, setUnseenMessages
     }
