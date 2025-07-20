@@ -13,7 +13,7 @@ const ChatInterface = () => {
   const [newMessage, setNewMessage] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
-  const [chatUser, setChatUser] = useState({})
+  // const [selectedUser, setSelectedUser] = useState({})
   const [isTyping, setIsTyping] = useState(false)
 
    const { messages, selectedUser, setSelectedUser, sendMessage, getMessages, users, getUsers } = useChat();
@@ -82,33 +82,29 @@ const ChatInterface = () => {
 
 useEffect(() => {
   const loadChatData = async () => {
-    let targetUser = selectedUser;
-    if(!users) await getUsers();
-    // If selectedUser is not set (like on refresh), find user by username in URL
-    if (!selectedUser && userId && users.length > 0) {
-      targetUser = users.find(u => u.username === userId);
-      if (targetUser) {
-        setSelectedUser(targetUser); // update state
-      }
+    // Ensure we have the user list
+    if (!users || users.length === 0) {
+      await getUsers(); // This will update `users`
     }
 
-    // Proceed only if we found the user
-    if (targetUser) {
-      setChatUser(targetUser);
-      setIsLoading(true);
-      try {
-        await getMessages(targetUser?._id);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Error fetching messages:", err);
-      } finally {
-        setIsLoading(false);
+    if (userId && users.length > 0) {
+      const targetUser = users.find(u => u.username === userId);
+      if (targetUser) {
+        setSelectedUser(targetUser);
+        setIsLoading(true);
+        try {
+          await getMessages(targetUser._id);
+        } catch (err) {
+          console.error("Error fetching messages:", err);
+        } finally {
+          setIsLoading(false);
+        }
       }
     }
   };
 
   loadChatData();
-}, [selectedUser, userId, users]);
+}, [userId, users]);
 
   useEffect(() => {
     scrollToBottom()
@@ -187,28 +183,28 @@ useEffect(() => {
 
               <div className="relative">
                 <img
-                  src={chatUser?.avatar || "/placeholder.svg?height=50&width=50"}
-                  alt={chatUser?.fullName}
+                  src={selectedUser?.avatar || "/placeholder.svg?height=50&width=50"}
+                  alt={selectedUser?.fullName}
                   className="w-12 h-12 rounded-full object-cover border-2 border-green-200"
                   onError={(e) => {
                     e.target.src = "/placeholder.svg?height=50&width=50"
                   }}
                 />
-                {chatUser?.isOnline && (
+                {selectedUser?.isOnline && (
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                 )}
               </div>
 
               <div>
-                <h2 className="font-bold text-gray-900 text-lg">{chatUser?.fullName}</h2>
+                <h2 className="font-bold text-gray-900 text-lg">{selectedUser?.fullName}</h2>
                 <div className="flex items-center space-x-2 text-sm">
                   <span
-                    className={`w-2 h-2 rounded-full ${chatUser?.isOnline ? "bg-green-500" : "bg-gray-400"}`}
+                    className={`w-2 h-2 rounded-full ${selectedUser?.isOnline ? "bg-green-500" : "bg-gray-400"}`}
                   ></span>
                   <span className="text-gray-600">
-                    {chatUser?.isOnline ? "Online" : `Last seen ${formatTime(chatUser?.lastSeen)}`}
+                    {selectedUser?.isOnline ? "Online" : `Last seen ${formatTime(selectedUser?.lastSeen)}`}
                   </span>
-                  <span className="text-green-600 font-medium capitalize">• {chatUser?.userType}</span>
+                  <span className="text-green-600 font-medium capitalize">• {selectedUser?.userType}</span>
                 </div>
               </div>
             </div>
@@ -311,7 +307,7 @@ useEffect(() => {
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder={`Message ${chatUser?.fullName?.split(" ")[0]}...`}
+                  placeholder={`Message ${selectedUser?.fullName?.split(" ")[0]}...`}
                   className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none max-h-32"
                   rows="1"
                   onKeyDown={(e) => {

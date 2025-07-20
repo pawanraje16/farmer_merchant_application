@@ -112,7 +112,7 @@ const FeedPost = ({ post, onAuthorClick}) => {
         </div>
 
         <button
-          onClick={() => handleChatClick(post.author._id) }
+          onClick={() => handleChatClick(post.author.username) }
           className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl hover:bg-blue-200 transition-colors font-medium text-sm"
         >
           💬 Chat
