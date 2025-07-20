@@ -1,7 +1,8 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { useChat } from "../context/ChatContext"
 
 const ChatList = () => {
   const navigate = useNavigate()
@@ -9,13 +10,17 @@ const ChatList = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
 
+  const {getUsers, users, setSelectedUser, unseenMessages, setUnseenMessages} = useChat();
+
+  // const filteredUsers = input ? users.filter((user) => user.fullName.toLowerCase().includes(input.toLowerCase())) : users;
+
   // Mock chat list data
   const mockChats = [
     {
       _id: "chat1",
       userId: "user456",
-      userName: "Priya Sharma",
-      userPhoto: "/placeholder.svg?height=50&width=50",
+      fullName: "Priya Sharma",
+      avatar: "/placeholder.svg?height=50&width=50",
       lastMessage: "Thanks for your message! I'll get back to you soon. 😊",
       lastMessageTime: "2024-01-15T10:30:00Z",
       unreadCount: 2,
@@ -25,8 +30,8 @@ const ChatList = () => {
     {
       _id: "chat2",
       userId: "user789",
-      userName: "Amit Kumar",
-      userPhoto: "/placeholder.svg?height=50&width=50",
+      fullName: "Amit Kumar",
+      avatar: "/placeholder.svg?height=50&width=50",
       lastMessage: "Do you have organic rice available?",
       lastMessageTime: "2024-01-15T08:45:00Z",
       unreadCount: 0,
@@ -36,8 +41,8 @@ const ChatList = () => {
     {
       _id: "chat3",
       userId: "user101",
-      userName: "Sunita Patel",
-      userPhoto: "/placeholder.svg?height=50&width=50",
+      fullName: "Sunita Patel",
+      avatar: "/placeholder.svg?height=50&width=50",
       lastMessage: "Perfect! I'll take 5kg of tomatoes.",
       lastMessageTime: "2024-01-14T16:20:00Z",
       unreadCount: 1,
@@ -47,8 +52,8 @@ const ChatList = () => {
     {
       _id: "chat4",
       userId: "user202",
-      userName: "Rajesh Singh",
-      userPhoto: "/placeholder.svg?height=50&width=50",
+      fullName: "Rajesh Singh",
+      avatar: "/placeholder.svg?height=50&width=50",
       lastMessage: "When will the next batch of wheat be ready?",
       lastMessageTime: "2024-01-14T14:15:00Z",
       unreadCount: 0,
@@ -58,8 +63,8 @@ const ChatList = () => {
     {
       _id: "chat5",
       userId: "user303",
-      userName: "Meera Devi",
-      userPhoto: "/placeholder.svg?height=50&width=50",
+      fullName: "Meera Devi",
+      avatar: "/placeholder.svg?height=50&width=50",
       lastMessage: "Your organic vegetables are amazing! 🌱",
       lastMessageTime: "2024-01-13T18:30:00Z",
       unreadCount: 3,
@@ -68,22 +73,39 @@ const ChatList = () => {
     },
   ]
 
-  useEffect(() => {
-    const loadChats = async () => {
-      setIsLoading(true)
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 800))
-        setChats(mockChats)
-      } catch (error) {
-        console.error("Error loading chats:", error)
-      } finally {
-        setIsLoading(false)
-      }
+ useEffect(() => {
+  const loadChats = async () => {
+    setIsLoading(true)
+    try {
+      await getUsers() // wait for users to load
+    } catch (error) {
+      console.error("Error loading chats:", error)
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    loadChats()
-  }, [])
+  loadChats()
+}, [])
+
+  useEffect(() => {
+  // whenever users update, map them into chats
+  if (users.length > 0) {
+    const mappedChats = users.map((user) => ({
+      _id: user._id,
+      userId: user._id,
+      fullName: user.fullName || "Unnamed",
+      avatar: user.avatar || "/placeholder.svg?height=50&width=50",
+      lastMessage: "Start a conversation 👋", // or fetch latest message if available
+      lastMessageTime: user.lastActive || new Date().toISOString(),
+      unreadCount: 0, // you can merge unseenMessages here
+      isOnline: user.isOnline || false,
+      userType: user.userType || "merchant",
+      username: user.username, // needed for search
+    }))
+    setChats(mappedChats)
+  }
+}, [users])
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp)
@@ -96,7 +118,7 @@ const ChatList = () => {
     return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" })
   }
 
-  const filteredChats = chats.filter((chat) => chat.userName.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredChats = chats.filter((chat) => chat.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const totalUnreadCount = chats.reduce((total, chat) => total + chat.unreadCount, 0)
 
@@ -173,7 +195,9 @@ const ChatList = () => {
               {filteredChats.map((chat, index) => (
                 <div
                   key={chat._id}
-                  onClick={() => navigate(`/chat/${chat.userId}`)}
+                  onClick={() => {
+                    setSelectedUser(chat)
+                    navigate(`/chat/${chat.username}`)}}
                   className={`px-6 py-4 hover:bg-gray-50 cursor-pointer transition-all duration-200 group ${
                     index === 0 ? "rounded-t-3xl" : ""
                   } ${index === filteredChats.length - 1 ? "rounded-b-3xl" : ""}`}
@@ -181,8 +205,8 @@ const ChatList = () => {
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <img
-                        src={chat.userPhoto || "/placeholder.svg?height=50&width=50"}
-                        alt={chat.userName}
+                        src={chat.avatar || "/placeholder.svg?height=50&width=50"}
+                        alt={chat.fullName}
                         className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 group-hover:border-blue-300 transition-colors"
                         onError={(e) => {
                           e.target.src = "/placeholder.svg?height=50&width=50"
@@ -198,7 +222,7 @@ const ChatList = () => {
                         <h3
                           className={`font-semibold truncate ${chat.unreadCount > 0 ? "text-gray-900" : "text-gray-700"}`}
                         >
-                          {chat.userName}
+                          {chat.fullName}
                         </h3>
                         <div className="flex items-center space-x-2">
                           <span className="text-xs text-gray-500">{formatTime(chat.lastMessageTime)}</span>

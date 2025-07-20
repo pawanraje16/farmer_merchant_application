@@ -4,6 +4,10 @@ import cookieParser from "cookie-parser"
 
 const app = express()
 
+
+
+
+
 app.use(cors({
     origin: ["https://farmermerchantconnection.vercel.app", "http://localhost:5173"],
     credentials: true
@@ -23,6 +27,7 @@ import { addressRouter } from "./routes/address.route.js"
 import followRouter from "./routes/follow.route.js"
 import { errorHandler } from "./middlewares/errorHandler.js"
 import likeRouter from "./routes/like.route.js"
+import messageRouter from "./routes/message.route.js"
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
@@ -41,6 +46,9 @@ app.use("/api/v1/follow",followRouter)
 
 // like Routes
 app.use("/api/v1/like", likeRouter);
+
+// chat Routes
+app.use("/api/v1/messages", messageRouter)
 
 app.use(errorHandler)
 

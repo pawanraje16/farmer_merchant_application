@@ -22,6 +22,7 @@ import {Toaster, toast} from "react-hot-toast"
 import { AppProvider } from './context/AppProvider.jsx'
 import ProtectedRoute from './routes/protected-route.jsx'
 import PublicRoute from './routes/PublicRoute.jsx'
+import ChatInterface from './components/ChatInterface.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,7 +40,7 @@ const router = createBrowserRouter(
         <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="user/:username" element={<ProtectedRoute><PublicProfile /></ProtectedRoute>} />
         <Route path="chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-        <Route path="chat/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+        <Route path="chat/:userId" element={<ProtectedRoute><ChatInterface /></ProtectedRoute>} />
         <Route path="post/:postId" element={<ProtectedRoute><PostDetail/></ProtectedRoute>}/>
         <Route path="create-post" element={<ProtectedRoute><CreatePost/></ProtectedRoute>}/>
       </Route>

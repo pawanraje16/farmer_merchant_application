@@ -5,6 +5,7 @@ import { MarketProvider }  from "./MarkteContext.jsx";
 import { FeedProvider } from "./FeedContext.jsx";
 
 import { MockDataProvider } from "./MockDataContext.jsx";
+import { ChatProvider } from "./ChatContext.jsx";
 
 export const AppProvider = ({ children }) => (
   <AuthProvider>
@@ -14,7 +15,9 @@ export const AppProvider = ({ children }) => (
           
             <MockDataProvider>
                 <FeedProvider>
-                    {children}
+                    <ChatProvider>
+                      {children}
+                    </ChatProvider>
                 </FeedProvider>
             </MockDataProvider>
           

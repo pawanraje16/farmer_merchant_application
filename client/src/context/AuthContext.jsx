@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import api from "../utils/api"; // Your axios instance with withCredentials: true
+import {io} from "socket.io-client";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
@@ -10,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [isFarmer, setIsFarmer] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
+  const [socket, setSocket] = useState(null);
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -18,9 +21,8 @@ export const AuthProvider = ({ children }) => {
         const { data } = await api.get("/api/v1/users/current-user"); // ✅ use consistent path
         if (data.success) {
           setUser(data.data.user);
+          connectSocket(data.data.user);
           console.log(data.user)
-          
-          
         }
       } catch (error) {
         setUser(null);
@@ -38,9 +40,10 @@ export const AuthProvider = ({ children }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      data.success
-        ? handleAuthSuccess(data.data.user)
-        : toast.error(data.message);
+      if (data.success){
+         handleAuthSuccess(data.data.user)
+        }
+        else toast.error(data.message);
       return data.success
     } catch (error) {
       const message =
@@ -90,15 +93,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Connect socket function to handle socket connections and online users updates
+
+  const connectSocket = (userData) => {
+       if(!userData || socket?.connect) return ;
+       const newSocket = io(backendUrl, {
+        query: {
+          userId: userData._id,
+        }
+       });
+       newSocket.connect();
+       setSocket(newSocket);
+
+       newSocket.on("getOnlineUsers", (userId) => {
+        setOnlineUsers(userId);
+       })
+  }
+
   const handleAuthSuccess = (u) => {
     setUser(u);
     // setIsFarmer(u.userType === "farmer");
     toast.success("Welcome to AgroConnect!");
+    connectSocket(u);
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, isFarmer, loadingAuth, login, register, logout }}
+      value={{ user, isFarmer, loadingAuth, login, register, logout, socket, }}
     >
       {children}
     </AuthContext.Provider>

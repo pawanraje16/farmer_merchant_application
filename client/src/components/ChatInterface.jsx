@@ -1,30 +1,34 @@
-"use client"
+
 
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { useChat } from "../context/ChatContext"
+import { useAuth } from "../context/AuthContext"
 
 const ChatInterface = () => {
   const { userId } = useParams()
   const navigate = useNavigate()
   const messagesEndRef = useRef(null)
-  const [messages, setMessages] = useState([])
+  // const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
-  const [chatUser, setChatUser] = useState(null)
+  const [chatUser, setChatUser] = useState({})
   const [isTyping, setIsTyping] = useState(false)
 
+   const { messages, selectedUser, setSelectedUser, sendMessage, getMessages, users } = useChat();
+   const {user} = useAuth()
+   
   // Mock chat user data
   const mockChatUser = {
     _id: "user456",
     username: "organic_farmer_priya",
     fullName: "Priya Sharma",
-    profilePhoto: "/placeholder.svg?height=50&width=50",
+    avatar: "/placeholder.svg?height=50&width=50",
     isOnline: true,
     lastSeen: "2024-01-15T10:30:00Z",
     userType: "farmer",
   }
-
   // Mock messages
   const mockMessages = [
     {
@@ -75,80 +79,55 @@ const ChatInterface = () => {
     },
   ]
 
-  useEffect(() => {
-    const loadChatData = async () => {
-      setIsLoading(true)
-      try {
-        // Simulate API calls
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        setChatUser(mockChatUser)
-        setMessages(mockMessages)
-      } catch (error) {
-        console.error("Error loading chat:", error)
-      } finally {
-        setIsLoading(false)
+
+useEffect(() => {
+  const loadChatData = async () => {
+    let targetUser = selectedUser;
+
+    // If selectedUser is not set (like on refresh), find user by username in URL
+    if (!selectedUser && userId && users.length > 0) {
+      targetUser = users.find(u => u.username === userId);
+      if (targetUser) {
+        setSelectedUser(targetUser); // update state
       }
     }
 
-    if (userId) {
-      loadChatData()
+    // Proceed only if we found the user
+    if (targetUser) {
+      setChatUser(targetUser);
+      setIsLoading(true);
+      try {
+        await getMessages(targetUser?._id);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching messages:", err);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [userId])
+  };
+
+  loadChatData();
+}, [selectedUser, userId, users]);
 
   useEffect(() => {
     scrollToBottom()
   }, [messages])
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    if(messagesEndRef.current && messages){messagesEndRef.current.scrollIntoView({ behavior: "smooth" })}
   }
+
 
   const handleSendMessage = async (e) => {
     e.preventDefault()
-    if (!newMessage.trim() || isSending) return
-
-    const messageText = newMessage.trim()
-    setNewMessage("")
+    if (!newMessage.trim() || isSending) return null
+    
     setIsSending(true)
-
-    // Add message optimistically
-    const tempMessage = {
-      _id: `temp_${Date.now()}`,
-      senderId: "currentUser",
-      receiverId: userId,
-      message: messageText,
-      timestamp: new Date().toISOString(),
-      isRead: false,
-      messageType: "text",
-    }
-
-    setMessages((prev) => [...prev, tempMessage])
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      // Simulate typing indicator
-      setIsTyping(true)
-      setTimeout(() => {
-        setIsTyping(false)
-        // Simulate response (in real app, this would come from WebSocket)
-        const responseMessage = {
-          _id: `response_${Date.now()}`,
-          senderId: userId,
-          receiverId: "currentUser",
-          message: "Thanks for your message! I'll get back to you soon. 😊",
-          timestamp: new Date().toISOString(),
-          isRead: false,
-          messageType: "text",
-        }
-        setMessages((prev) => [...prev, responseMessage])
-      }, 2000)
-    } catch (error) {
-      console.error("Error sending message:", error)
-    } finally {
-      setIsSending(false)
-    }
+    await sendMessage({text: newMessage.trim()});
+    setIsSending(false);  
+    setNewMessage("")
+  
   }
 
   const formatTime = (timestamp) => {
@@ -208,7 +187,7 @@ const ChatInterface = () => {
 
               <div className="relative">
                 <img
-                  src={chatUser?.profilePhoto || "/placeholder.svg?height=50&width=50"}
+                  src={chatUser?.avatar || "/placeholder.svg?height=50&width=50"}
                   alt={chatUser?.fullName}
                   className="w-12 h-12 rounded-full object-cover border-2 border-green-200"
                   onError={(e) => {
@@ -236,10 +215,10 @@ const ChatInterface = () => {
 
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => navigate(`/user/${userId}`)}
+                onClick={() => navigate(`/user/${selectedUser?.username}`)}
                 className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium"
               >
-                View Profile
+               {selectedUser?.fullName}
               </button>
               <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <span className="text-xl">📞</span>
@@ -254,8 +233,10 @@ const ChatInterface = () => {
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.map((message, index) => {
-            const isCurrentUser = message.senderId === "currentUser"
-            const showDate = index === 0 || formatDate(messages[index - 1].timestamp) !== formatDate(message.timestamp)
+            const isCurrentUser = message.senderId === user._id
+            const showDate = index === 0 || formatDate(messages[index - 1].
+          createdAt) !== formatDate(message.
+          createdAt)
 
             return (
               <div key={message._id}>
@@ -263,7 +244,7 @@ const ChatInterface = () => {
                 {showDate && (
                   <div className="flex justify-center my-6">
                     <span className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm font-medium">
-                      {formatDate(message.timestamp)}
+                      {formatDate(message.createdAt)}
                     </span>
                   </div>
                 )}
@@ -278,12 +259,12 @@ const ChatInterface = () => {
                           : "bg-white text-gray-800 border border-gray-200 rounded-bl-md"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed">{message.message}</p>
+                      <p className="text-sm leading-relaxed">{message.text}</p>
                     </div>
                     <div
                       className={`flex items-center mt-1 space-x-1 ${isCurrentUser ? "justify-end" : "justify-start"}`}
                     >
-                      <span className="text-xs text-gray-500">{formatTime(message.timestamp)}</span>
+                      <span className="text-xs text-gray-500">{formatTime(message.createdAt)}</span>
                       {isCurrentUser && (
                         <span className="text-xs">
                           {message.isRead ? (
