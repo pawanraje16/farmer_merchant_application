@@ -200,12 +200,19 @@ const Navbar = () => {
             </button>
             <button
               onClick={() => {
-                handleChat()
-                setMenuOpen(false)
+                handleChat();
+                setMenuOpen(false);
               }}
               className="flex items-center space-x-3 px-4 py-3 text-green-700 hover:bg-green-200 rounded-xl transition-all duration-300"
             >
-              <span className="text-xl">💬</span>
+              <div className="relative">
+                <span className="text-xl">💬</span>
+                {totalUnreadCount > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-green-500 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                    {totalUnreadCount}
+                  </span>
+                )}
+              </div>
               <span className="font-medium">Chat</span>
             </button>
             <button
