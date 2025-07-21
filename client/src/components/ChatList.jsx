@@ -226,9 +226,9 @@ const ChatList = () => {
                         </h3>
                         <div className="flex items-center space-x-2">
                           <span className="text-xs text-gray-500">{formatTime(chat.lastMessageTime)}</span>
-                          {chat.unreadCount > 0 && (
+                          {unseenMessages[chat._id] > 0 && (
                             <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center font-bold animate-pulse">
-                              {chat.unreadCount}
+                              {unseenMessages[chat._id]}
                             </span>
                           )}
                         </div>
@@ -236,7 +236,7 @@ const ChatList = () => {
                       <div className="flex items-center justify-between">
                         <p
                           className={`text-sm truncate flex-1 mr-2 ${
-                            chat.unreadCount > 0 ? "text-gray-900 font-medium" : "text-gray-600"
+                            unseenMessages[chat._id] > 0 ? "text-gray-900 font-medium" : "text-gray-600"
                           }`}
                         >
                           {chat.lastMessage}

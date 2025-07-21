@@ -52,7 +52,7 @@ const PostDetail = () => {
   }
 
   const handleChatClick = () => {
-    if (post?.author?._id) {
+    if (post?.author?.username) {
       navigate(`/chat/${post.author.username}`)
     }
   }
