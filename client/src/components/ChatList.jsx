@@ -97,8 +97,7 @@ const ChatList = () => {
       fullName: user.fullName || "Unnamed",
       avatar: user.avatar || "/placeholder.svg?height=50&width=50",
       lastMessage: "Start a conversation 👋", // or fetch latest message if available
-      lastMessageTime: user.lastActive || new Date().toISOString(),
-      unreadCount: 0, // you can merge unseenMessages here
+      lastMessageTime: user.createdAt || new Date().toISOString(),
       isOnline: user.isOnline || false,
       userType: user.userType || "merchant",
       username: user.username, // needed for search

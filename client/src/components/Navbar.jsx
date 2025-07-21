@@ -3,12 +3,14 @@
 import { useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext";
+import { useChat } from "../context/ChatContext";
 
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate();
   const {logout} = useAuth()
+  const {totalUnreadCount} = useChat();
 
   const handleProfile = () => {
     navigate("/Profile")
@@ -101,9 +103,16 @@ const Navbar = () => {
               <button
                 onClick={handleChat}
                 title="Chat"
-                className="p-2 text-green-700 hover:bg-green-200 rounded-full transition-all duration-300 hover:scale-110"
+                className="relative p-2 text-green-700 hover:bg-green-200 rounded-full transition-all duration-300 hover:scale-110"
               >
-                <span className="text-xl">💬</span>
+                <div className="relative">
+                  <span className="text-xl">💬</span>
+                  {totalUnreadCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                      {totalUnreadCount}
+                    </span>
+                  )}
+                </div>
               </button>
               <button
                 onClick={handleLogout}

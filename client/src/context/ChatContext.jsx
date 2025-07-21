@@ -77,6 +77,9 @@ export const ChatProvider = ({ children }) => {
         if(socket) socket.off("newMessage");
     }
 
+    // Total new unread messages 
+    const totalUnreadCount = Object.values(unseenMessages).reduce((acc, count) => acc + count, 0);
+
     useEffect(() => {
         subscribeToMessages();
         return () => unsubscribeFromMessages();
@@ -108,7 +111,7 @@ export const ChatProvider = ({ children }) => {
     }, [unseenMessages]);
 
     const value = {
-        messages, users, selectedUser, getUsers, getMessages, sendMessage, setSelectedUser, unseenMessages, setUnseenMessages
+        messages, users, selectedUser, getUsers, getMessages, sendMessage, setSelectedUser, unseenMessages, setUnseenMessages,totalUnreadCount,
     }
 
   return (
