@@ -1,7 +1,7 @@
 
 
 import { useParams } from "react-router-dom"
-import ChatInterface from "../components/ChatInterface"
+import ChatInterface from "../components/UserChat"
 import ChatList from "../components/ChatList"
 
 const Chat = () => {

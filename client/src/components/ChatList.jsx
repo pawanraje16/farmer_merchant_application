@@ -1,4 +1,4 @@
-
+// src/components/ChatList.js
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -10,101 +10,57 @@ const ChatList = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
 
-  const {getUsers, users, setSelectedUser, unseenMessages, setUnseenMessages} = useChat();
+  const { getUsers, users, setSelectedUser, unseenMessages, setUnseenMessages } = useChat()
 
-  // const filteredUsers = input ? users.filter((user) => user.fullName.toLowerCase().includes(input.toLowerCase())) : users;
-
-  // Mock chat list data
-  const mockChats = [
-    {
-      _id: "chat1",
-      userId: "user456",
-      fullName: "Priya Sharma",
-      avatar: "/placeholder.svg?height=50&width=50",
-      lastMessage: "Thanks for your message! I'll get back to you soon. 😊",
-      lastMessageTime: "2024-01-15T10:30:00Z",
-      unreadCount: 2,
-      isOnline: true,
-      userType: "farmer",
-    },
-    {
-      _id: "chat2",
-      userId: "user789",
-      fullName: "Amit Kumar",
-      avatar: "/placeholder.svg?height=50&width=50",
-      lastMessage: "Do you have organic rice available?",
-      lastMessageTime: "2024-01-15T08:45:00Z",
-      unreadCount: 0,
-      isOnline: false,
-      userType: "merchant",
-    },
-    {
-      _id: "chat3",
-      userId: "user101",
-      fullName: "Sunita Patel",
-      avatar: "/placeholder.svg?height=50&width=50",
-      lastMessage: "Perfect! I'll take 5kg of tomatoes.",
-      lastMessageTime: "2024-01-14T16:20:00Z",
-      unreadCount: 1,
-      isOnline: true,
-      userType: "merchant",
-    },
-    {
-      _id: "chat4",
-      userId: "user202",
-      fullName: "Rajesh Singh",
-      avatar: "/placeholder.svg?height=50&width=50",
-      lastMessage: "When will the next batch of wheat be ready?",
-      lastMessageTime: "2024-01-14T14:15:00Z",
-      unreadCount: 0,
-      isOnline: false,
-      userType: "merchant",
-    },
-    {
-      _id: "chat5",
-      userId: "user303",
-      fullName: "Meera Devi",
-      avatar: "/placeholder.svg?height=50&width=50",
-      lastMessage: "Your organic vegetables are amazing! 🌱",
-      lastMessageTime: "2024-01-13T18:30:00Z",
-      unreadCount: 3,
-      isOnline: true,
-      userType: "farmer",
-    },
-  ]
-
- useEffect(() => {
-  const loadChats = async () => {
-    setIsLoading(true)
-    try {
-      await getUsers() // wait for users to load
-    } catch (error) {
-      console.error("Error loading chats:", error)
-    } finally {
-      setIsLoading(false)
-    }
+  // 1. Define the AI assistant chat object here
+  const aiAssistantChat = {
+    _id: "agro-assistant",
+    userId: "agro-assistant",
+    fullName: "AgroConnect Assistant",
+    username: "agro-assistant",
+    avatar: "client\public\logo.png", // Use a unique AI icon
+    lastMessage: "I can help with crop prices, weather, and more!",
+    lastMessageTime: new Date().toISOString(),
+    unreadCount: 0,
+    isOnline: true,
+    userType: "AI",
+    isAI: true, // This flag is crucial for filtering and styling
   }
-
-  loadChats()
-}, [])
 
   useEffect(() => {
-  // whenever users update, map them into chats
-  if (users.length > 0) {
-    const mappedChats = users.map((user) => ({
-      _id: user._id,
-      userId: user._id,
-      fullName: user.fullName || "Unnamed",
-      avatar: user.avatar || "/placeholder.svg?height=50&width=50",
-      lastMessage: "Start a conversation 👋", // or fetch latest message if available
-      lastMessageTime: user.createdAt || new Date().toISOString(),
-      isOnline: user.isOnline || false,
-      userType: user.userType || "merchant",
-      username: user.username, // needed for search
-    }))
-    setChats(mappedChats)
-  }
-}, [users])
+    const loadChats = async () => {
+      setIsLoading(true)
+      try {
+        await getUsers() // Wait for users to load
+      } catch (error) {
+        console.error("Error loading chats:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadChats()
+  }, [])
+
+  useEffect(() => {
+    // 2. Prepend the AI chat to the list of users
+    if (users.length > 0) {
+      const mappedChats = users.map((user) => ({
+        _id: user._id,
+        userId: user._id,
+        fullName: user.fullName || "Unnamed",
+        avatar: user.avatar || "/placeholder.svg?height=50&width=50",
+        lastMessage: "Start a conversation 👋",
+        lastMessageTime: user.createdAt || new Date().toISOString(),
+        isOnline: user.isOnline || false,
+        userType: user.userType || "merchant",
+        username: user.username,
+      }))
+      setChats([aiAssistantChat, ...mappedChats])
+    } else {
+      // If there are no other users, still show the AI assistant
+      setChats([aiAssistantChat])
+    }
+  }, [users])
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp)
@@ -117,9 +73,14 @@ const ChatList = () => {
     return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" })
   }
 
-  const filteredChats = chats.filter((chat) => chat.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
+  // 3. Update filtering and sorting logic
+  const filteredChats = chats
+    .filter((chat) => chat.isAI || chat.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => (a.isAI === b.isAI ? 0 : a.isAI ? -1 : 1))
 
-  const totalUnreadCount = chats.reduce((total, chat) => total + chat.unreadCount, 0)
+  // This part is for the total unread count and needs to be updated.
+  // The AI chat won't have unread messages.
+  const totalUnreadCount = chats.reduce((total, chat) => total + (unseenMessages[chat._id] || 0), 0)
 
   if (isLoading) {
     return (
@@ -196,7 +157,8 @@ const ChatList = () => {
                   key={chat._id}
                   onClick={() => {
                     setSelectedUser(chat)
-                    navigate(`/chat/${chat.username}`)}}
+                    navigate(`/chat/${chat.username}`)
+                  }}
                   className={`px-6 py-4 hover:bg-gray-50 cursor-pointer transition-all duration-200 group ${
                     index === 0 ? "rounded-t-3xl" : ""
                   } ${index === filteredChats.length - 1 ? "rounded-b-3xl" : ""}`}
@@ -242,10 +204,20 @@ const ChatList = () => {
                         </p>
                         <span
                           className={`text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1 ${
-                            chat.userType === "farmer" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                            chat.userType === "farmer"
+                              ? "bg-green-100 text-green-800"
+                              : chat.userType === "AI"
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-blue-100 text-blue-800"
                           }`}
                         >
-                          <span>{chat.userType === "farmer" ? "🚜" : "🏪"}</span>
+                          <span>
+                            {chat.userType === "farmer"
+                              ? "🚜"
+                              : chat.userType === "AI"
+                              ? "🤖"
+                              : "🏪"}
+                          </span>
                           <span className="capitalize">{chat.userType}</span>
                         </span>
                       </div>
@@ -280,7 +252,7 @@ const ChatList = () => {
         </div>
 
         {/* Quick Actions */}
-        {chats.length > 0 && (
+        {filteredChats.length > 0 && (
           <div className="mt-6 bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -294,7 +266,6 @@ const ChatList = () => {
                   <div className="text-sm text-green-600">Discover new suppliers</div>
                 </div>
               </button>
-
               <button
                 onClick={() => navigate("/market")}
                 className="flex items-center space-x-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors group"
@@ -305,7 +276,6 @@ const ChatList = () => {
                   <div className="text-sm text-blue-600">Connect with buyers</div>
                 </div>
               </button>
-
               <button
                 onClick={() => navigate("/profile")}
                 className="flex items-center space-x-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors group"
