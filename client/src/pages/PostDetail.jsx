@@ -84,7 +84,7 @@ if (!post) {
           className="mb-6 flex items-center space-x-2 px-4 py-2 bg-white rounded-xl shadow-sm hover:bg-gray-50 transition-colors"
         >
           <span>←</span>
-          <span>Back to results</span>
+          <span>Back</span>
         </button>
 
       {post && ( <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
