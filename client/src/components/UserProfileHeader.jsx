@@ -7,7 +7,7 @@ const UserProfileHeader = ({
   isOwnProfile = false,
   onEditProfile,
   onStartChat,
-  onFollow,
+  onFollow,        
   onUnfollow,
   isFollowing = false,
   isLoading = false,

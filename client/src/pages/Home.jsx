@@ -11,17 +11,18 @@ import EmptyState from "../components/EmptyState"
 import { useFeed } from "../context/FeedContext"
 import { usePost } from "../context/PostContext"
 import { useAuth } from "../context/AuthContext"
+import { useFilter } from "../context/FilterContext"
 import toast from "react-hot-toast"
 
 const Home = () => {
   const navigate = useNavigate()
  
 
-   const {setPosts,isLoading,setIsLoading
-  ,filters,mockFeedPosts}=useFeed()
-   
+   const {setPosts,isLoading,setIsLoading,mockFeedPosts}=useFeed()
+
   const {fetchPosts,posts} = usePost()
   const {user,loadingAuth} = useAuth();
+  const {filters, filteredPosts, updateFilters} = useFilter();
 
 
   // useEffect(() => {
@@ -47,9 +48,8 @@ const Home = () => {
   }, [])
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters)
-    // In real app, this would trigger API call with filters
     console.log("Applying filters:", newFilters)
+    updateFilters(newFilters)
   }
 
   // const handlePostClick = (post) => {
@@ -87,8 +87,8 @@ const Home = () => {
 
         {/* Feed Posts */}
         <div className="space-y-8">
-          {posts.length > 0 ? (
-            posts.map((post) => (
+          {filteredPosts.length > 0 ? (
+            filteredPosts.map((post) => (
               <FeedPost
                 key={post._id}
                 post={post}

@@ -593,7 +593,7 @@ const getUserByUsername = asyncHandler (async(req, res) => {
 
 
 
-export{
+export {
    registerUser,
    loginUser,
    logoutUser,

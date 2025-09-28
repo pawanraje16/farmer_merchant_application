@@ -69,13 +69,25 @@ const PostFilters = ({ filters, onFilterChange, showCropSpecificFilters = false 
         newFilters[key] = value
       }
 
+      // Category validation - ensure category is never empty for crop-specific filters
+      if (key === "cropType" && !value) {
+        newFilters.cropType = "all"
+      }
+
       onFilterChange(newFilters)
     } else {
       // For Home page with simpler filters
       const newFilters = { ...filters, [key]: value }
+
+      // Category validation - ensure category is never empty
+      if (key === "category" && !value) {
+        newFilters.category = "all"
+      }
+
       onFilterChange(newFilters)
     }
   }
+
 
   return (
     <div className="bg-white rounded-3xl shadow-lg border border-gray-100 mb-8 overflow-hidden">
@@ -92,6 +104,7 @@ const PostFilters = ({ filters, onFilterChange, showCropSpecificFilters = false 
             {isExpanded ? "Hide Filters" : "Show Filters"}
           </button>
         </div>
+
 
         {/* Quick Category Filters - Always Visible */}
         <div className="mt-4 flex flex-wrap gap-2">

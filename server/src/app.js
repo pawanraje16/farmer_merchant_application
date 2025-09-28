@@ -28,6 +28,7 @@ import followRouter from "./routes/follow.route.js"
 import { errorHandler } from "./middlewares/errorHandler.js"
 import likeRouter from "./routes/like.route.js"
 import messageRouter from "./routes/message.route.js"
+import searchRouter from "./routes/search.routes.js"
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
@@ -49,6 +50,9 @@ app.use("/api/v1/like", likeRouter);
 
 // chat Routes
 app.use("/api/v1/messages", messageRouter)
+
+// search Routes
+app.use("/api/v1/search", searchRouter)
 
 app.use(errorHandler)
 
