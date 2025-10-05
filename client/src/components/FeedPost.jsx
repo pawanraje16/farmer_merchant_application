@@ -208,7 +208,7 @@ const FeedPost = ({ post, onAuthorClick}) => {
 
           {/* Post Meta */}
           <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-100">
-            <div className="flex items-center space-x-6 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
               <span className="flex items-center space-x-1">
                 <span>📦</span>
                 <span>{post.quantity}</span>
@@ -229,7 +229,7 @@ const FeedPost = ({ post, onAuthorClick}) => {
               {isOwnPost && (
                 <button
                   onClick={handleToggleAvailability}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
                     isAvailable
                       ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
                       : "bg-green-100 text-green-700 hover:bg-green-200"
