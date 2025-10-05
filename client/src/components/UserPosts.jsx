@@ -5,7 +5,7 @@ const UserPosts = ({ posts, isOwnProfile = false, onCreatePost }) => {
   return (
     <div className="space-y-8">
       {posts.length > 0 ? (
-        posts.map((post) => <ProductPost key={post._id} post={post} />)
+        posts.map((post) => <ProductPost key={post._id} post={post} isOwnProfile={isOwnProfile} />)
       ) : (
         <div className="text-center py-16">
           <div className="bg-gradient-to-br from-green-100 to-blue-100 rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-6">

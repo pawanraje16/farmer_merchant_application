@@ -1,6 +1,6 @@
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteMultipleFromCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
@@ -280,10 +280,49 @@ const getUserPosts = asyncHandler(async (req, res) => {
 });
 
 
+const deletePost = asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const userId = req.user?._id;
+
+  if (!postId) {
+    throw new ApiError(400, "Post ID is required");
+  }
+
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw new ApiError(404, "Post not found");
+  }
+
+  // Check if the user is the author of the post
+  if (post.author.toString() !== userId.toString()) {
+    throw new ApiError(403, "You are not authorized to delete this post");
+  }
+
+  // Delete images from Cloudinary
+  if (post.images && post.images.length > 0) {
+    try {
+      await deleteMultipleFromCloudinary(post.images);
+      console.log(`Deleted ${post.images.length} images from Cloudinary for post ${postId}`);
+    } catch (error) {
+      console.error("Error deleting images from Cloudinary:", error);
+      // Continue with post deletion even if Cloudinary deletion fails
+    }
+  }
+
+  // Delete the post from database
+  await Post.findByIdAndDelete(postId);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Post deleted successfully"));
+});
+
 export {
   createPost,
   getPostById,
   getAllPosts,
   getLoggedInUserPosts,
-  getUserPosts
+  getUserPosts,
+  deletePost
 }

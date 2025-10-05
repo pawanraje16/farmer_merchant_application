@@ -376,7 +376,7 @@ const Profile = () => {
             {activeTab === "posts" && (
               <div className="space-y-8">
                 {userPosts.length > 0 ? (
-                  userPosts.map((post) => <ProductPost key={post._id} post={post} />)
+                  userPosts.map((post) => <ProductPost key={post._id} post={post} isOwnProfile={true} />)
                 ) : (
                   <div className="text-center py-16">
                     <div className="bg-gradient-to-br from-green-100 to-blue-100 rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-6">

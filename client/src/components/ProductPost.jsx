@@ -2,11 +2,16 @@ import { useNavigate } from "react-router-dom"
 import PostImage from "./PostImage"
 import { useState } from "react"
 import { toggleLike } from "../utils/like"
+import { usePost } from "../context/PostContext"
+import { useAuth } from "../context/AuthContext"
 
 
-const ProductPost = ({ post }) => {
+const ProductPost = ({ post, isOwnProfile = false }) => {
      const [isLiked, setIsLiked] = useState(post.isLiked)
        const [likesCount, setLikesCount] = useState(post.likesCount)
+       const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+       const { deletePost } = usePost()
+       const { user } = useAuth()
 
 
     const handleLike = async (e) => {
@@ -41,6 +46,24 @@ const ProductPost = ({ post }) => {
   }
 
   const navigate= useNavigate();
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation();
+    setShowDeleteConfirm(true);
+  }
+
+  const handleConfirmDelete = async (e) => {
+    e.stopPropagation();
+    const success = await deletePost(post._id);
+    if (success) {
+      setShowDeleteConfirm(false);
+    }
+  }
+
+  const handleCancelDelete = (e) => {
+    e.stopPropagation();
+    setShowDeleteConfirm(false);
+  }
 
   return (
     <div className="group bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-3xl p-6 md:p-8 hover:shadow-2xl transition-all duration-300 hover:border-green-200 relative overflow-hidden">
@@ -125,29 +148,66 @@ const ProductPost = ({ post }) => {
                 {post.isAvailable ? "✅ Available" : "❌ Sold Out"}
               </span>
             </div>
-            <div className="flex items-center space-x-6 text-sm text-gray-500">
-              <button
-                onClick={handleLike}
-                className={`flex items-center space-x-1 transition-colors ${
-                  isLiked ? "text-red-500" : "hover:text-red-500"
-                }`}
-              >
-                <span>{isLiked ? "❤️" : "🤍"}</span>
-                <span>{likesCount}</span>
-              </button>
-              <span className="flex items-center space-x-1 hover:text-blue-500 cursor-pointer transition-colors">
-                <span>💬</span>
-                <span>{post.comments}</span>
-              </span>
-              <span className="flex items-center space-x-1">
-                <span>👁️</span>
-                <span>{post.views}</span>
-              </span>
-              <span>{getTimeAgo(post.createdAt)}</span>
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center space-x-6 text-sm text-gray-500">
+                <button
+                  onClick={handleLike}
+                  className={`flex items-center space-x-1 transition-colors ${
+                    isLiked ? "text-red-500" : "hover:text-red-500"
+                  }`}
+                >
+                  <span>{isLiked ? "❤️" : "🤍"}</span>
+                  <span>{likesCount}</span>
+                </button>
+                <span className="flex items-center space-x-1 hover:text-blue-500 cursor-pointer transition-colors">
+                  <span>💬</span>
+                  <span>{post.comments}</span>
+                </span>
+                <span className="flex items-center space-x-1">
+                  <span>👁️</span>
+                  <span>{post.views}</span>
+                </span>
+                <span>{getTimeAgo(post.createdAt)}</span>
+              </div>
+              {isOwnProfile && (
+                <button
+                  onClick={handleDeleteClick}
+                  className="text-red-500 hover:text-red-700 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                  title="Delete post"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 backdrop-blur-[2px] flex items-center justify-center z-50" onClick={handleCancelDelete}>
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border-2 border-gray-200" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Delete Post?</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to delete this post? This action cannot be undone.</p>
+            <div className="flex space-x-3">
+              <button
+                onClick={handleCancelDelete}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-medium"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -29,3 +29,50 @@ export const uploadOnCloudinary = (buffer, mimetype, folder = "") =>
 
     Readable.from(buffer).pipe(stream);
   });
+
+/**
+ * Delete a file from Cloudinary using its URL
+ * Extracts the public_id from the URL and deletes the resource
+ */
+export const deleteFromCloudinary = async (imageUrl) => {
+  try {
+    if (!imageUrl) return null;
+
+    // Extract public_id from Cloudinary URL
+    // URL format: https://res.cloudinary.com/cloud_name/image/upload/v123456/folder/public_id.jpg
+    const urlParts = imageUrl.split('/');
+    const uploadIndex = urlParts.indexOf('upload');
+
+    if (uploadIndex === -1) return null;
+
+    // Get everything after 'upload/v123456/' or 'upload/'
+    const publicIdWithExtension = urlParts.slice(uploadIndex + 2).join('/');
+
+    // Remove file extension
+    const publicId = publicIdWithExtension.substring(0, publicIdWithExtension.lastIndexOf('.'));
+
+    // Delete from Cloudinary
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    console.error("Error deleting from Cloudinary:", error);
+    return null;
+  }
+};
+
+/**
+ * Delete multiple files from Cloudinary
+ */
+export const deleteMultipleFromCloudinary = async (imageUrls) => {
+  try {
+    if (!imageUrls || imageUrls.length === 0) return null;
+
+    const deletePromises = imageUrls.map(url => deleteFromCloudinary(url));
+    const results = await Promise.all(deletePromises);
+
+    return results;
+  } catch (error) {
+    console.error("Error deleting multiple images from Cloudinary:", error);
+    return null;
+  }
+};

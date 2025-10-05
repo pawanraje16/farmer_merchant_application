@@ -22,8 +22,23 @@ export const PostProvider = ({ children }) => {
     }
   };
 
+  const deletePost = async (postId) => {
+    try {
+      const response = await api.delete(`/api/v1/post/${postId}`);
+      if (response.data.success) {
+        // Remove the deleted post from the posts array
+        setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+        toast.success("Post deleted successfully");
+        return true;
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete post");
+      return false;
+    }
+  };
+
   return (
-    <PostContext.Provider value={{ posts, setPosts, fetchPosts, isLoadingPosts }}>
+    <PostContext.Provider value={{ posts, setPosts, fetchPosts, isLoadingPosts, deletePost }}>
       {children}
     </PostContext.Provider>
   );
