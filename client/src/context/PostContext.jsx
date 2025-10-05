@@ -37,8 +37,27 @@ export const PostProvider = ({ children }) => {
     }
   };
 
+  const togglePostAvailability = async (postId, isAvailable) => {
+    try {
+      const response = await api.patch(`/api/v1/post/${postId}/availability`, { isAvailable });
+      if (response.data.success) {
+        // Update the post in the posts array
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId ? { ...post, isAvailable } : post
+          )
+        );
+        toast.success(isAvailable ? "Marked as available" : "Marked as sold out");
+        return true;
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update availability");
+      return false;
+    }
+  };
+
   return (
-    <PostContext.Provider value={{ posts, setPosts, fetchPosts, isLoadingPosts, deletePost }}>
+    <PostContext.Provider value={{ posts, setPosts, fetchPosts, isLoadingPosts, deletePost, togglePostAvailability }}>
       {children}
     </PostContext.Provider>
   );

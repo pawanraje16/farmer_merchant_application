@@ -318,11 +318,44 @@ const deletePost = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Post deleted successfully"));
 });
 
+const updatePostAvailability = asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const { isAvailable } = req.body;
+  const userId = req.user?._id;
+
+  if (!postId) {
+    throw new ApiError(400, "Post ID is required");
+  }
+
+  if (typeof isAvailable !== "boolean") {
+    throw new ApiError(400, "isAvailable must be a boolean value");
+  }
+
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw new ApiError(404, "Post not found");
+  }
+
+  // Check if the user is the author of the post
+  if (post.author.toString() !== userId.toString()) {
+    throw new ApiError(403, "You are not authorized to update this post");
+  }
+
+  post.isAvailable = isAvailable;
+  await post.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, post, "Post availability updated successfully"));
+});
+
 export {
   createPost,
   getPostById,
   getAllPosts,
   getLoggedInUserPosts,
   getUserPosts,
-  deletePost
+  deletePost,
+  updatePostAvailability
 }

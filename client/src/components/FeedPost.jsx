@@ -15,8 +15,9 @@ const FeedPost = ({ post, onAuthorClick}) => {
   const [isLiked, setIsLiked] = useState(post.isLiked)
   const [likesCount, setLikesCount] = useState(post.likesCount)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isAvailable, setIsAvailable] = useState(post.isAvailable)
   const {user} = useAuth();
-  const { deletePost } = usePost();
+  const { deletePost, togglePostAvailability } = usePost();
 
   const getTimeAgo = (dateString) => {
     const now = new Date()
@@ -81,6 +82,17 @@ const FeedPost = ({ post, onAuthorClick}) => {
   const handleCancelDelete = (e) => {
     e.stopPropagation();
     setShowDeleteConfirm(false);
+  }
+
+  const handleToggleAvailability = async (e) => {
+    e.stopPropagation();
+    const newAvailability = !isAvailable;
+    setIsAvailable(newAvailability);
+    const success = await togglePostAvailability(post._id, newAvailability);
+    if (!success) {
+      // Revert on failure
+      setIsAvailable(!newAvailability);
+    }
   }
 
   const isOwnPost = user?._id === post.author._id;
@@ -209,11 +221,24 @@ const FeedPost = ({ post, onAuthorClick}) => {
               </span>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  post.isAvailable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                  isAvailable ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                 }`}
               >
-                {post.isAvailable ? "✅ Available" : "❌ Sold Out"}
+                {isAvailable ? "✅ Available" : "❌ Sold Out"}
               </span>
+              {isOwnPost && (
+                <button
+                  onClick={handleToggleAvailability}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                    isAvailable
+                      ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
+                      : "bg-green-100 text-green-700 hover:bg-green-200"
+                  }`}
+                  title={isAvailable ? "Mark as sold out" : "Mark as available"}
+                >
+                  {isAvailable ? "Mark Sold" : "Mark Available"}
+                </button>
+              )}
             </div>
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center space-x-6 text-sm text-gray-500">

@@ -89,7 +89,11 @@ const postSchema = new Schema(
             default: 0
         },
         comments: {
-            type: String, 
+            type: String,
+        },
+        isAvailable: {
+            type: Boolean,
+            default: true
         },
         author:{
             type: Schema.Types.ObjectId,
