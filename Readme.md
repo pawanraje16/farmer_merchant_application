@@ -29,7 +29,7 @@ We are bridging the gap between merchants and farmers by:
 - **Price Comparison**: Compare prices and quality across different farmers
 
 ### Platform Features 🌐
-- **Instagram-like Search**: Smart user search functionality in the navbar
+- **Search**: Smart user search functionality in the navbar
 - **Advanced Filtering**: Filter posts by category, location, price range, and availability
 - **Real-time Messaging**: Built-in chat system for seamless communication
 - **User Profiles**: Comprehensive profiles showing user type, location, and agricultural focus
